@@ -1,12 +1,12 @@
 syntax = "proto2";
 
-package foo;
+package timestup;
 
-option java_package = "guru.bonacci.foo";
-option java_outer_classname = "Movers";
+option java_package = "guru.bonacci.timesup";
+option java_outer_classname = "Entities";
 
 message Mover {
-  required string name = 1;
-  required int32 id = 2;
-  optional string email = 3;
+  required string id = 1;
+  required float lat = 2;
+  required float lon = 3;
 }
