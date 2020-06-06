@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package foo;
+
+option java_package = "guru.bonacci.foo";
+option java_outer_classname = "Movers";
+
+message Mover {
+  required string name = 1;
+  required int32 id = 2;
+  optional string email = 3;
+}
