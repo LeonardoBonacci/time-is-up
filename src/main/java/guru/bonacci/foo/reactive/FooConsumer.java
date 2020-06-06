@@ -1,18 +1,3 @@
-/*
- * Copyright (c) 2016-2018 Pivotal Software Inc, All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package guru.bonacci.foo.reactive;
 
 import java.text.SimpleDateFormat;
@@ -24,7 +9,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,18 +21,6 @@ import reactor.kafka.receiver.ReceiverOffset;
 import reactor.kafka.receiver.ReceiverOptions;
 import reactor.kafka.receiver.ReceiverRecord;
 
-/**
- * Sample consumer application using Reactive API for Kafka.
- * To run sample consumer
- * <ol>
- *   <li> Start Zookeeper and Kafka server
- *   <li> Update {@link #BOOTSTRAP_SERVERS} and {@link #TOPIC} if required
- *   <li> Create Kafka topic {@link #TOPIC}
- *   <li> Send some messages to the topic, e.g. by running {@link FooProducer}
- *   <li> Run {@link FooConsumer} as Java application with all dependent jars in the CLASSPATH (eg. from IDE).
- *   <li> Shutdown Kafka server and Zookeeper when no longer required
- * </ol>
- */
 public class FooConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(FooConsumer.class.getName());
