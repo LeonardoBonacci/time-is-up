@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -27,7 +28,7 @@ public class SampleProducer {
 
     private static final String BOOTSTRAP_SERVERS = "localhost:9092";
     private static final String SCHEMA_REGISTRY = "http://127.0.0.1:8081";
-    static final String TOPIC = "movers-t";
+    static final String TOPIC = "movers";
 
     private final KafkaSender<String, Mover> sender;
     private final SimpleDateFormat dateFormat;
@@ -52,7 +53,9 @@ public class SampleProducer {
         sender.send(Flux.range(1, count)
                         .map(i -> { 
                         	String id = UUID.randomUUID().toString();
-                        	return SenderRecord.create(new ProducerRecord<>(topic, id, Mover.newBuilder().setId(id).setLat(1.1f).setLon(3.11f).build()), i);
+                        	Pair<Float, Float> step = step(i);
+                        	String loc = step.getLeft() + "," + step.getRight(); 
+                        	return SenderRecord.create(new ProducerRecord<>(topic, id, Mover.newBuilder().setId(id).setLOCATION(loc).setUPDATEDTS(System.currentTimeMillis()).build()), i);
                     		}))
               .doOnError(e -> log.error("Send failed", e))
               .subscribe(r -> {
@@ -79,4 +82,20 @@ public class SampleProducer {
         latch.await(10, TimeUnit.SECONDS);
         producer.close();
     }
+    
+    static float fromLat = -36.661281f;
+    static float fromLon = 174.743549f;
+    static float toLat = -36.801947f;
+    static float toLon = 174.758768f;
+
+    static float distanceLat = Math.abs(toLat - fromLat);
+    static float distanceLon = Math.abs(toLon - fromLon);
+
+    static float stepLat = distanceLat / 20;;
+    static float stepLon = distanceLon / 20;;
+
+    Pair<Float, Float> step(int count) {
+    	return Pair.of(fromLat + count*stepLat, fromLon + count*stepLon);
+    }
+
 }

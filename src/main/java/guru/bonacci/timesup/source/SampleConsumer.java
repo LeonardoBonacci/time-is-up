@@ -49,7 +49,6 @@ public class SampleConsumer {
     }
 
     public Disposable consumeMessages(String topic, CountDownLatch latch) {
-
         ReceiverOptions<String, Mover> options = receiverOptions.subscription(Collections.singleton(topic))
                 .addAssignListener(partitions -> log.debug("onPartitionsAssigned {}", partitions))
                 .addRevokeListener(partitions -> log.debug("onPartitionsRevoked {}", partitions));

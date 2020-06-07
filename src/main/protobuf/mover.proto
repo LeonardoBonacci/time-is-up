@@ -7,6 +7,6 @@ option java_outer_classname = "Entities";
 
 message Mover {
   required string id = 1;
-  required float lat = 2;
-  required float lon = 3;
+  required string LOCATION = 2;
+  optional int64 UPDATED_TS = 3;
 }
