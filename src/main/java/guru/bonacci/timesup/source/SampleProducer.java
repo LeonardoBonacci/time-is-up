@@ -1,10 +1,11 @@
 package guru.bonacci.timesup.source;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +27,7 @@ public class SampleProducer {
 
     private static final Logger log = LoggerFactory.getLogger(SampleProducer.class.getName());
 
-    private static final String BOOTSTRAP_SERVERS = "localhost:9092";
+    private static final String BOOTSTRAP_SERVERS = "localhost:29092";
     private static final String SCHEMA_REGISTRY = "http://127.0.0.1:8081";
     static final String TOPIC = "movers";
 
@@ -49,14 +50,10 @@ public class SampleProducer {
         dateFormat = new SimpleDateFormat("HH:mm:ss:SSS z dd MMM yyyy");
     }
 
-    public void sendMessages(String topic, int count, CountDownLatch latch) throws InterruptedException {
-        sender.send(Flux.range(1, count)
-                        .map(i -> { 
-                        	String id = UUID.randomUUID().toString();
-                        	Pair<Float, Float> step = step(i);
-                        	String loc = step.getLeft() + "," + step.getRight(); 
-                        	return SenderRecord.create(new ProducerRecord<>(topic, id, Mover.newBuilder().setId(id).setLOCATION(loc).setUPDATEDTS(System.currentTimeMillis()).build()), i);
-                    		}))
+//	String loc = step.getLeft() + "," + step.getRight(); 
+    public void sendMessages(String topic, CountDownLatch latch) throws InterruptedException {
+        sender.send(Flux.interval(Duration.ofSeconds(1))
+                        .map(i -> SenderRecord.create(toRecord(topic, StepSimulator.step(i)), i)))
               .doOnError(e -> log.error("Send failed", e))
               .subscribe(r -> {
                   RecordMetadata metadata = r.recordMetadata();
@@ -70,32 +67,46 @@ public class SampleProducer {
               });
     }
 
+    ProducerRecord<String, Mover> toRecord(String topic, Pair<Float, Float> step) {
+    	String id = "10";
+    	return new ProducerRecord<>(topic, id, Mover.newBuilder().setId(id).setLat(step.getLeft()).setLon(step.getRight()).setUPDATEDTS(System.currentTimeMillis()).build());
+    }
+
     public void close() {
         sender.close();
     }
 
     public static void main(String[] args) throws Exception {
-        int count = 20;
+        int count = 1000;
         CountDownLatch latch = new CountDownLatch(count);
         SampleProducer producer = new SampleProducer(BOOTSTRAP_SERVERS);
-        producer.sendMessages(TOPIC, count, latch);
-        latch.await(10, TimeUnit.SECONDS);
+        producer.sendMessages(TOPIC, latch);
+        latch.await(5, TimeUnit.MINUTES);
         producer.close();
     }
     
-    static float fromLat = -36.661281f;
-    static float fromLon = 174.743549f;
-    static float toLat = -36.801947f;
-    static float toLon = 174.758768f;
-
-    static float distanceLat = Math.abs(toLat - fromLat);
-    static float distanceLon = Math.abs(toLon - fromLon);
-
-    static float stepLat = distanceLat / 20;;
-    static float stepLon = distanceLon / 20;;
-
-    Pair<Float, Float> step(int count) {
-    	return Pair.of(fromLat + count*stepLat, fromLon + count*stepLon);
+    static class StepSimulator {
+    	
+	    static float fromLat = -36.661281f;
+	    static float fromLon = 174.743549f;
+	    static float toLat = -36.801947f;
+	    static float toLon = 174.758768f;
+	
+	    static float distanceLat = Math.abs(toLat - fromLat);
+	    static float distanceLon = Math.abs(toLon - fromLon);
+	
+	    static float stepSizeLat = distanceLat / 20;;
+	    static float stepSizeLon = distanceLon / 20;;
+	
+	    static Pair<Float, Float> step(long counter) {
+	    	long count = counter % 20;
+	    	
+	    	float stepDev = new Random().nextFloat();
+	    	float nextLatStep = fromLat + count*(stepDev*stepSizeLat);
+	    	float nextLonStep = fromLon + count*(stepDev*stepSizeLon);
+	    	
+	    	return Pair.of(nextLatStep % distanceLat, nextLonStep % distanceLon);
+	    }
     }
 
 }

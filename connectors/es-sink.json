@@ -5,7 +5,7 @@
     "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
     "connection.url": "http://es:9200",
 
-    "topics": "movers",
+    "topics": "moveon",
     "type.name": "",
     "schema.ignore": "true",
 

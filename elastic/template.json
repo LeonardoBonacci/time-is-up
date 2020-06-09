@@ -1,6 +1,4 @@
-curl -X PUT http://localhost:9200/_template/kafkaconnect \
-    -H "Content-Type:application/json" \
-    -d '{
+{
   "index_patterns": ["*"],
   "settings": {
     "number_of_shards": 1,
@@ -21,4 +19,4 @@ curl -X PUT http://localhost:9200/_template/kafkaconnect \
       "LOCATION": { "type": "geo_point" }
     }
   }
-}'
+}
