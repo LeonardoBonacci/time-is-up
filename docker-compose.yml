@@ -1,7 +1,7 @@
----
 version: '2'
-
 services:
+
+  # FIRST THE KAFKA STACK
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.0
     hostname: zookeeper
@@ -96,15 +96,23 @@ services:
       KSQL_CONNECT_REST_ADVERTISED_HOST_NAME: ksqldb-server
     volumes:
       - ./confluent-hub-components/confluentinc-kafka-connect-elasticsearch:/usr/share/kafka/plugins/elasticsearch
+      - ./confluent-hub-components/leonardobonacci-kafka-connect-tile38-sink:/usr/share/kafka/plugins/tile38
 
-  # ksqldb-cli:
-  #   image: confluentinc/ksqldb-cli:0.9.0
-  #   container_name: ksqldb-cli
-  #   depends_on:
-  #     - broker
-  #     - ksqldb-server
-  #   entrypoint: /bin/sh
-  #   tty: true
+  ksqldb-cli:
+    image: confluentinc/ksqldb-cli:0.9.0
+    container_name: ksqldb-cli
+    depends_on:
+      - broker
+      - ksqldb-server
+    entrypoint: /bin/sh
+    tty: true
+
+
+  # THEN THE OTHER STUFF
+  tile38:
+    image: tile38/tile38:1.21.1
+    ports:
+      - "9851:9851"
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.1

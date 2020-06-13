@@ -1,6 +1,6 @@
 package guru.bonacci.timesup.source;
 
-import static guru.bonacci.timesup.source.SampleProducer.TOPIC;
+import static guru.bonacci.timesup.source.SampleMoverProducer.TOPIC;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;

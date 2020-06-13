@@ -11,3 +11,10 @@ message Mover {
   required float lon = 3;
   optional int64 UPDATED_TS = 4;
 }
+
+message Unmoved {
+  required string id = 1;
+  optional string name = 2;
+  required float lat = 3;
+  required float lon = 4;
+}
