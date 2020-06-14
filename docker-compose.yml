@@ -92,10 +92,11 @@ services:
       KSQL_CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
       KSQL_CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
       KSQL_CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 1
+      KSQL_CONNECT_INTERNAL_TOPIC_REPLICAS: 1
       KSQL_CONNECT_PLUGIN_PATH: "/usr/share/kafka/plugins"
       KSQL_CONNECT_REST_ADVERTISED_HOST_NAME: ksqldb-server
     volumes:
-      - ./confluent-hub-components/confluentinc-kafka-connect-elasticsearch:/usr/share/kafka/plugins/elasticsearch
       - ./confluent-hub-components/leonardobonacci-kafka-connect-tile38-sink:/usr/share/kafka/plugins/tile38
 
   ksqldb-cli:
@@ -113,21 +114,3 @@ services:
     image: tile38/tile38:1.21.1
     ports:
       - "9851:9851"
-
-  es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.1
-    hostname: elasticsearch
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-
-  kib:
-    image: docker.elastic.co/kibana/kibana:7.7.1
-    ports:
-      - 5601:5601
-    environment:
-      ELASTICSEARCH_URL: http://es:9200
-      ELASTICSEARCH_HOSTS: http://es:9200

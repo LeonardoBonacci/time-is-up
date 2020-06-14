@@ -4,40 +4,27 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class StepSimulator {
 	
-    static float fromLat = -36.661281f;
-    static float fromLon = 174.743549f;
-    static float toLat = -36.801947f;
-    static float toLon = 174.758768f;
+	private static float fromLat = -1.00f;
+	private static float fromLon = -1.00f;
+	private static float toLat = 1.00f;
+	private static float toLon = 1.00f;
 
-    static float distanceLat = Math.abs(toLat - fromLat);
-    static float distanceLon = Math.abs(toLon - fromLon);
+	private static float distanceLat = Math.abs(toLat - fromLat);
+	private static float distanceLon = Math.abs(toLon - fromLon);
 
-    static float stepSizeLat = distanceLat / 20;;
-    static float stepSizeLon = distanceLon / 20;;
+    static Pair<Float, Float> stepMover(int nrSteps, int i) {
+    	final int stepNr = i + 1;
+    	final float stepSizeLat = distanceLat / nrSteps;
+    	final float stepSizeLon = distanceLon / nrSteps;
 
-    static Pair<Float, Float> stepMover(long counter) {
-    	long count = counter % 20;
-    	
-//    	float stepDev = new Random().nextFloat();
-//    	float nextLatStep = fromLat + count*(stepDev*stepSizeLat);
-//    	float nextLonStep = fromLon + count*(stepDev*stepSizeLon);
+    	final float nextLat = fromLat + stepNr*stepSizeLat;
+    	final float nextLon = fromLon + stepNr*stepSizeLon;
 
-    	float nextLatStep = fromLat + count*stepSizeLat;
-    	float nextLonStep = fromLon + count*stepSizeLon;
-
-    	return Pair.of(nextLatStep % distanceLat, nextLonStep % distanceLon);
+    	return Pair.of(nextLat, nextLon);
     }
     
-    static Pair<Float, Float> unmoved(long counter) {
-        float stepSizeLat = distanceLat / 5;;
-        float stepSizeLon = distanceLon / 5;;
-
-        long count = counter % 5;
-    	
-    	float nextLatStep = fromLat + count*stepSizeLat;
-    	float nextLonStep = fromLon + count*stepSizeLon;
-
-    	return Pair.of(nextLatStep % distanceLat, nextLonStep % distanceLon);
+    static Pair<Float, Float> stepUnmoved() {
+    	return Pair.of(0.99f, 0.99f);
     }
 }
 

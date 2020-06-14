@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package timestup;
+
+option java_package = "guru.bonacci.timesup.model";
+option java_outer_classname = "TheMover";
+
+message Mover {
+  required string id = 1;
+  required float lat = 2;
+  required float lon = 3;
+}
