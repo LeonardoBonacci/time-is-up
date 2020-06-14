@@ -22,9 +22,5 @@ public class StepSimulator {
 
     	return Pair.of(nextLat, nextLon);
     }
-    
-    static Pair<Float, Float> stepUnmoved() {
-    	return Pair.of(0.99f, 0.99f);
-    }
 }
 

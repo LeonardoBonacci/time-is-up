@@ -15,7 +15,7 @@ import guru.bonacci.timesup.model.TheMover.Mover;
 
 public class MoverProducer {
 
-	static final String TOPIC = "mover_t1";
+	static final String TOPIC = "mover";
 	
 	Producer<String, Mover> producer;
 
@@ -45,7 +45,7 @@ public class MoverProducer {
 		final int nrSteps = 11;
 		for (int i = 0; i < nrSteps; i++) {
 			
-			String id = "fooId";
+			String id = "moverId";
 			Pair<Float, Float> step = StepSimulator.stepMover(nrSteps, i);
 	    	Mover record = Mover.newBuilder().setId(id).setLat(step.getLeft()).setLon(step.getRight()).build();
 
