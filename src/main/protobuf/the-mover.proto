@@ -7,6 +7,6 @@ option java_outer_classname = "TheMover";
 
 message Mover {
   required string id = 1;
-  required float lat = 2;
-  required float lon = 3;
+  required double lat = 2;
+  required double lon = 3;
 }
