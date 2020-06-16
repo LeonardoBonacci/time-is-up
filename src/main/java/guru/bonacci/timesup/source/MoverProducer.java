@@ -45,7 +45,7 @@ public class MoverProducer {
 		final int nrSteps = 11;
 		for (int i = 0; i < nrSteps; i++) {
 			
-			String id = "moverId";
+			String id = "me";
 			Pair<Float, Float> step = StepSimulator.stepMover(nrSteps, i);
 	    	Mover record = Mover.newBuilder().setId(id).setLat(step.getLeft()).setLon(step.getRight()).build();
 

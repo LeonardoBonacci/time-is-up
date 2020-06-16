@@ -10,7 +10,6 @@ CREATE STREAM mover
 
 CREATE STREAM unmoved
  (id VARCHAR,
-  name VARCHAR,
   latitude DOUBLE,
   longitude DOUBLE)
  WITH (KAFKA_TOPIC = 'unmoved',
@@ -18,11 +17,11 @@ CREATE STREAM unmoved
        KEY = 'id',
        PARTITIONS = 1);
 
-INSERT INTO unmoved (id, name, latitude, longitude) VALUES ('unmovedId', 'some place', 1.0, 1.0);
+INSERT INTO unmoved (id, latitude, longitude) VALUES ('Torpedo7Albany', 1.0, 1.0);
 
 CREATE TABLE track
- (rowkey VARCHAR KEY,
-   id VARCHAR,
+  (rowkey VARCHAR KEY,
+   tracking_number VARCHAR,
    mover_id VARCHAR,
    unmoved_id VARCHAR)
 WITH (KAFKA_TOPIC = 'track',
@@ -30,13 +29,17 @@ WITH (KAFKA_TOPIC = 'track',
      KEY = 'mover_id',
      PARTITIONS = 1);
 
-INSERT INTO track (rowkey, id, mover_id, unmoved_id) VALUES ('moverId', 'trackId', 'moverId', 'unmovedId');
+INSERT INTO track (rowkey, tracking_number, mover_id, unmoved_id) VALUES ('me', '3SABC1234567890', 'me', 'Torpedo7Albany');
 
 CREATE STREAM trace
   WITH (VALUE_FORMAT = 'protobuf',
         KAFKA_TOPIC = 'trace',
         PARTITIONS = 1)
-  AS SELECT mover.id AS id, mover.lat AS lat, mover.lon AS lon, track.id AS track_id
+  AS SELECT mover.id AS mover_id,
+          mover.lat AS lat,
+          mover.lon AS lon,
+          track.tracking_number AS tracking_number,
+          track.unmoved_id AS unmoved_id
   FROM mover
   INNER JOIN track ON mover.id = track.mover_id
   PARTITION BY mover.id
@@ -50,29 +53,35 @@ CREATE SINK CONNECTOR tile WITH (
   'value.converter' = 'io.confluent.connect.protobuf.ProtobufConverter',
   'value.converter.schema.registry.url' = 'http://schema-registry:8081',
   'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LATITUDE event.LONGITUDE',
-  'tile38.topic.trace' = 'SET trace event.ID POINT event.LAT event.LON',
+  'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.LAT event.LON',
   'tile38.host' = 'tile38',
   'tile38.port' = 9851,
   'errors.tolerance' = 'all',
   'errors.log.enable' = true,
   'errors.log.include.messages' = true);
 
-  CREATE STREAM arrival (id STRING)
-  WITH (KAFKA_TOPIC='arrival', VALUE_FORMAT='JSON');
+CREATE STREAM tile_arrival (id STRING, nearby STRUCT<id STRING>)
+  WITH (KAFKA_TOPIC = 'tile_arrival',
+        VALUE_FORMAT='json');
 
+CREATE STREAM arrival
+  WITH (VALUE_FORMAT = 'protobuf',
+        KAFKA_TOPIC = 'arrival',
+        PARTITIONS = 1)
+  AS SELECT id as mover_id,
+          nearby->id as unmoved_id
+  FROM tile_arrival
+  WHERE nearby IS NOT NULL
+  PARTITION BY id;
 
-CREATE STREAM arrivals (id STRING, faraway STRUCT<id STRING>) WITH (KAFKA_TOPIC='arrival', VALUE_FORMAT='JSON');
-
-CREATE STREAM arrivals3  AS SELECT id as mover_id, faraway->id as unmoved_id FROM arrivals WHERE faraway IS NOT NULL PARTITION BY id;
-
-SELECT arrivals3.moved_id AS id
+-- back to the future
+SELECT trace.id as mover_id,
+		trace.lat as lat,
+        trace.lon as lon,
+        trace.tracking_number as trackingnumber,
+        arrival.unmoved_id as unmoved_id,
+        arrival.rowtime - trace.rowtime as togo
   FROM trace
-  INNER JOIN arrivals3 WITHIN 2 HOURS ON arrivals3.moved_id = trace.id
-  WHERE arrivals3.moved_id = trace.id
-  EMIT CHANGES;
-
-SELECT arrivals3.moved_id AS id
-  FROM trace
-  INNER JOIN arrivals3 WITHIN 2 HOURS ON arrivals3.moved_id = trace.id
-  WHERE arrivals3.unmoved_id = trace.unmoved_id
+  INNER JOIN arrival WITHIN (0 MILLISECONDS, 1 HOUR) ON arrival.mover_id = trace.id
+  WHERE arrival.unmoved_id = trace.unmoved_id
   EMIT CHANGES;
