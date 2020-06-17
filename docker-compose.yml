@@ -93,10 +93,17 @@ services:
       KSQL_CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
       KSQL_CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
       KSQL_CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      KSQL_CONNECT_PLUGIN_PATH: "/usr/share/kafka/plugins"
+      KSQL_CONNECT_PLUGIN_PATH: "/usr/share/kafka/plugins,/usr/share/java,/tmp/connect-plugins,/usr/share/confluent-hub-components"
       KSQL_CONNECT_REST_ADVERTISED_HOST_NAME: ksqldb-server
+      KSQL_KSQL_EXTENTION_DIR: "/usr/ext"
     volumes:
-      - ./confluent-hub-components/leonardobonacci-kafka-connect-tile38-sink:/usr/share/kafka/plugins/tile38
+      - ./ksql:/usr/ext #mounts a custom UDF jar for ksql
+    command:
+      - bash
+      - -c
+      - |
+        confluent-hub install --no-prompt leonardobonacci/kafka-connect-tile38-sink:1.0.1
+        /etc/confluent/docker/run
 
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.9.0
