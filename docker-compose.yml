@@ -97,7 +97,7 @@ services:
       KSQL_CONNECT_REST_ADVERTISED_HOST_NAME: ksqldb-server
       KSQL_KSQL_EXTENTION_DIR: "/usr/ext"
     volumes:
-      - ./ksql:/usr/ext #mounts a custom UDF jar for ksql
+      - ./ksqldb:/usr/ext #mounts a custom UDF jar for ksql
     command:
       - bash
       - -c

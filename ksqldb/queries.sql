@@ -8,6 +8,8 @@ CREATE STREAM mover
         VALUE_FORMAT='protobuf',
         KEY = 'id');
 
+-- add insert statements
+
 CREATE STREAM unmoved
  (id VARCHAR,
   latitude DOUBLE,
@@ -23,7 +25,7 @@ CREATE STREAM unmoved_geo
    WITH (VALUE_FORMAT = 'protobuf',
          KAFKA_TOPIC = 'unmoved_geo',
          PARTITIONS = 1)
-   AS SELECT id, latitude, longitude, ABS(latitude) AS geohash
+   AS SELECT id, latitude, longitude, GEOHASH(latitude, longitude, 6) AS geohash
    FROM unmoved;
 
 CREATE TABLE unmoved_geo_t
