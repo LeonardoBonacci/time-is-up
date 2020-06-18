@@ -1,14 +1,17 @@
--- first generate some data with sample producer
-
 CREATE STREAM mover
   (id VARCHAR,
    lat DOUBLE,
    lon DOUBLE)
   WITH (KAFKA_TOPIC='mover',
         VALUE_FORMAT='protobuf',
-        KEY = 'id');
+        KEY = 'id',
+        PARTITIONS = 1);
 
--- add insert statements
+INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.61, 0.94);
+INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.71, 0.96);
+INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.81, 0.98);
+INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.91, 0.99);
+INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 1.0, 1.0);
 
 CREATE STREAM unmoved
  (id VARCHAR,
@@ -33,7 +36,7 @@ CREATE TABLE unmoved_geo_t
   id VARCHAR,
   latitude DOUBLE,
   longitude DOUBLE,
-  geohash DOUBLE)
+  geohash VARCHAR)
 WITH (KAFKA_TOPIC = 'unmoved_geo',
     VALUE_FORMAT = 'protobuf',
     KEY = 'id',
@@ -49,7 +52,7 @@ WITH (KAFKA_TOPIC = 'track',
      KEY = 'mover_id',
      PARTITIONS = 1);
 
-INSERT INTO track_t (rowkey, tracking_number, mover_id, unmoved_id) VALUES ('me', '3SABC1234567890', 'me', 'Torpedo7Albany');
+INSERT INTO track_t (rowkey, tracking_number, mover_id, unmoved_id) VALUES ('thisisme', '3SABC1234567890', 'thisisme', 'Torpedo7Albany');
 
 CREATE STREAM trace
   WITH (VALUE_FORMAT = 'protobuf',
@@ -74,13 +77,13 @@ CREATE STREAM trace_by_unmoved_id
 
 CREATE STREAM trace_geo
     WITH (VALUE_FORMAT = 'protobuf',
-          KAFKA_TOPIC = 'trace_to_dest',
+          KAFKA_TOPIC = 'trace_geo',
           PARTITIONS = 1)
     AS SELECT
         trace.mover_id,
         trace.lat AS mover_lat,
         trace.lon AS mover_lon,
-        ABS(trace.lat) AS mover_geohash,
+        GEOHASH(trace.lat, trace.lon, 6) AS mover_geohash,
         unmoved.latitude AS unmoved_lat,
         unmoved.longitude AS unmoved_lon,
         unmoved.geohash AS unmoved_geohash,
@@ -125,9 +128,9 @@ CREATE STREAM arrival
   PARTITION BY id;
 
 -- back to the future
-CREATE STREAM pickup
+CREATE STREAM pickup1
   WITH (VALUE_FORMAT = 'protobuf',
-      KAFKA_TOPIC = 'pickup',
+      KAFKA_TOPIC = 'pickup1',
       PARTITIONS = 1)
   AS SELECT
     trace.mover_id,
@@ -140,29 +143,29 @@ CREATE STREAM pickup
     trace.tracking_number,
     trace.unmoved_id,
     arrival.rowtime - trace.rowtime as togo_ms
-  FROM trace_to_geo AS trace
+  FROM trace_geo AS trace
   INNER JOIN arrival WITHIN (0 MILLISECONDS, 1 HOUR) ON arrival.mover_id = trace.mover_id
   WHERE arrival.unmoved_id = trace.unmoved_id
   PARTITION BY arrival.unmoved_id;
 
-CREATE STREAM ready
+CREATE STREAM ready1
   WITH (VALUE_FORMAT = 'protobuf',
-      KAFKA_TOPIC = 'ready',
+      KAFKA_TOPIC = 'ready1',
       PARTITIONS = 1)
   AS SELECT
-    CAST(mover_geohash AS STRING) + '/' + CAST(mover_geohash AS STRING) as key,
+    (mover_geohash + '/' + unmoved_geohash) as hashkey,
     togo_ms
-  FROM pickup
-  PARTITION BY CAST(mover_geohash AS STRING) + '/' + CAST(mover_geohash AS STRING);
+  FROM pickup1
+  PARTITION BY (mover_geohash + '/' + unmoved_geohash);
 
 CREATE TABLE estimate
     WITH (VALUE_FORMAT = 'protobuf',
         KAFKA_TOPIC = 'estimate',
         PARTITIONS = 1)
-    AS SELECT key,
-      AVG(togo)
-      FROM ready
-      GROUP BY key
+    AS SELECT hashkey,
+      AVG(togo_ms)
+      FROM ready1
+      GROUP BY hashkey
       EMIT CHANGES;
 
 CREATE STREAM trace_ready
@@ -170,9 +173,9 @@ CREATE STREAM trace_ready
       KAFKA_TOPIC = 'trace_ready',
       PARTITIONS = 1)
   AS SELECT *,
-    CAST(mover_geohash AS STRING) + '/' + CAST(mover_geohash AS STRING) as key
-  FROM pickup
-  PARTITION BY CAST(mover_geohash AS STRING) + '/' + CAST(mover_geohash AS STRING);
+    (mover_geohash + '/' + unmoved_geohash) as hashkey
+  FROM pickup1
+  PARTITION BY (mover_geohash + '/' + unmoved_geohash);
 
 CREATE STREAM home
     WITH (VALUE_FORMAT = 'protobuf',
@@ -180,5 +183,5 @@ CREATE STREAM home
           PARTITIONS = 1)
     AS SELECT *
     FROM trace_ready AS trace
-    INNER JOIN estimate ON estimate.key = trace.key
-    PARTITION BY trace.TRACE_UNMOVED_ID;
+    INNER JOIN estimate ON estimate.hashkey = trace.hashkey
+    PARTITION BY trace.trace_unmoved_id;
