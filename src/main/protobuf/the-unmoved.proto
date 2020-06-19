@@ -1,12 +1,12 @@
 syntax = "proto2";
 
-package timestup;
+package timesup;
 
 option java_package = "guru.bonacci.timesup.model";
 option java_outer_classname = "TheUnmoved";
 
 message Unmoved {
   required string id = 1;
-  required float latitude = 3;
-  required float longitude = 4;
+  required float latitude = 2;
+  required float longitude = 3;
 }

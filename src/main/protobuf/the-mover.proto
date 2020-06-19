@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package timestup;
+package timesup;
 
 option java_package = "guru.bonacci.timesup.model";
 option java_outer_classname = "TheMover";

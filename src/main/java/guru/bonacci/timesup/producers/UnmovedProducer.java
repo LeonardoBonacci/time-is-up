@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.streams;
+package guru.bonacci.timesup.producers;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -27,7 +27,7 @@ public class UnmovedProducer {
 
     static final String BOOTSTRAP_SERVERS = "localhost:29092";
     static final String SCHEMA_REGISTRY = "http://127.0.0.1:8081";
-    static final String TOPIC = "testunmoved";
+    static final String TOPIC = "unmoved";
 
     private final KafkaSender<String, Unmoved> sender;
     private final SimpleDateFormat dateFormat;
@@ -66,9 +66,10 @@ public class UnmovedProducer {
     }
 
     ProducerRecord<String, Unmoved> toRecord(String topic) {
-    	Unmoved record = Unmoved.newBuilder().setId("bar").setLatitude(1.0f).setLongitude(1.0f).build();
+    	String id = "bar";
+    	Unmoved record = Unmoved.newBuilder().setId(id).setLatitude(1.0f).setLongitude(1.0f).build();
 //    	record = null;
-    	return new ProducerRecord<>(topic, "foo", record);
+    	return new ProducerRecord<>(topic, id, record);
     }
 
     public void close() {

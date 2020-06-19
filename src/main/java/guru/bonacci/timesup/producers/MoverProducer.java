@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.streams;
+package guru.bonacci.timesup.producers;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
