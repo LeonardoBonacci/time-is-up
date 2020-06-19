@@ -7,7 +7,6 @@ option java_outer_classname = "TheUnmoved";
 
 message Unmoved {
   required string id = 1;
-  optional string name = 2;
   required float latitude = 3;
   required float longitude = 4;
 }

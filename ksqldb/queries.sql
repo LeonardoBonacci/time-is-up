@@ -79,9 +79,9 @@ INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.91, 0.99);
 INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 1.0, 1.0);
 
 -- mover + track = trace
-CREATE STREAM trace1
+CREATE STREAM trace
   WITH (VALUE_FORMAT = 'protobuf',
-        KAFKA_TOPIC = 'trace1',
+        KAFKA_TOPIC = 'trace',
         PARTITIONS = 2)
   AS SELECT
           mover.id AS mover_id,
@@ -98,12 +98,12 @@ CREATE STREAM trace1
 CREATE SINK CONNECTOR tile WITH (
   'tasks.max' = '1',
   'connector.class' = 'guru.bonacci.kafka.connect.tile38.Tile38SinkConnector',
-  'topics' = 'unmoved,trace1',
+  'topics' = 'unmoved,trace',
   'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
   'value.converter' = 'io.confluent.connect.protobuf.ProtobufConverter',
   'value.converter.schema.registry.url' = 'http://schema-registry:8081',
   'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LATITUDE event.LONGITUDE',
-  'tile38.topic.trace1' = 'SET trace event.MOVER_ID POINT event.LAT event.LON',
+  'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.LAT event.LON',
   'tile38.host' = 'tile38',
   'tile38.port' = 9851,
   'errors.tolerance' = 'all',
@@ -177,4 +177,4 @@ CREATE STREAM homeward
      estimate.togo_ms as togo_ms
     FROM trace_to_estimate AS trace
     INNER JOIN estimate_t as estimate ON estimate.hashkey = trace.hashkey
-    PARTITION BY trace.unmoved_id;
+    PARTITION BY trace.tracking_number;
