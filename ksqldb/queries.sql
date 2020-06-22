@@ -16,16 +16,8 @@ CREATE STREAM unmoved_geo
   AS SELECT id, latitude, longitude, GEOHASH(latitude, longitude, 8) AS geohash
   FROM unmoved;
 
-CREATE TABLE unmoved_geo_t
-  (rowkey VARCHAR KEY,
-   id VARCHAR,
-   latitude DOUBLE,
-   longitude DOUBLE,
-   geohash VARCHAR)
- WITH (KAFKA_TOPIC = 'unmoved_geo',
-     VALUE_FORMAT = 'protobuf',
-     KEY = 'id',
-     PARTITIONS = 1);
+-- CREATE TABLE unmoved_geo_t
+-- this has become part of a KStream app
 
 -- todo key on tracking_number
 CREATE STREAM track
@@ -40,30 +32,16 @@ WITH (KAFKA_TOPIC = 'track',
 
 INSERT INTO track (rowkey, tracking_number, mover_id, unmoved_id) VALUES ('Torpedo7Albany', '3SABC1234567890', 'thisisme', 'Torpedo7Albany');
 
--- this join becomes a globaltable join on unmoved_id
-CREATE STREAM track_geo
-  WITH (KAFKA_TOPIC = 'track_geo',
-        VALUE_FORMAT = 'protobuf',
-        PARTITIONS = 2)
-  AS SELECT
-        track.tracking_number AS tracking_number,
-        track.mover_id AS mover_id,
-        track.unmoved_id AS unmoved_id,
-        unmoved.geohash AS unmoved_geohash
-  FROM track
-  INNER JOIN unmoved_geo_t AS unmoved ON track.unmoved_id = unmoved.id
-  PARTITION BY track.mover_id;
+-- CREATE STREAM track_geo
+-- this has become part of a KStream app
 
-CREATE TABLE track_geo_t
-  (rowkey VARCHAR KEY,
-   tracking_number VARCHAR,
+CREATE STREAM track_geo
+  (tracking_number VARCHAR,
    mover_id VARCHAR,
-   unmoved_id VARCHAR,
-   unmoved_geohash VARCHAR)
- WITH (KAFKA_TOPIC = 'track_geo',
+   unmoved_id VARCHAR)
+WITH (KAFKA_TOPIC = 'track_geo',
      VALUE_FORMAT = 'protobuf',
-     KEY = 'mover_id',
-     PARTITIONS = 2);
+     KEY = 'mover_id');
 
 CREATE STREAM mover
   (id VARCHAR,
@@ -89,13 +67,14 @@ CREATE STREAM trace
           mover.id AS mover_id,
           mover.lat AS lat,
           mover.lon AS lon,
-          GEOHASH(mover.lat, mover.lon, 6) AS mover_geohash,
+          GEOHASH(mover.lat, mover.lon, 6) AS mover_geohash, -- add variable length
           track.tracking_number AS tracking_number,
           track.unmoved_id AS unmoved_id,
           track.unmoved_geohash AS unmoved_geohash
   FROM mover
-  INNER JOIN track_geo_t AS track ON mover.id = track.mover_id
-  PARTITION BY track.mover_id;
+  INNER JOIN track_geo AS track WITHIN (1 DAY, 0 SECONDS) ON mover.id = track.mover_id
+  PARTITION BY mover.id;
+
 
 CREATE SINK CONNECTOR tile WITH (
   'tasks.max' = '1',
@@ -144,7 +123,7 @@ CREATE STREAM pickup
     mover_geohash + '/' + unmoved_geohash as hashkey
   FROM trace AS trace
   INNER JOIN arrival as arrival WITHIN (0 MILLISECONDS, 1 HOUR) ON arrival.mover_id = trace.mover_id
-afka  WHERE arrival.unmoved_id = trace.unmoved_id
+  WHERE arrival.unmoved_id = trace.unmoved_id
   PARTITION BY (mover_geohash + '/' + unmoved_geohash);
 
 -- 2 partitions!

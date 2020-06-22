@@ -48,6 +48,7 @@ public class TopologySupplier {
                             			.setUnmovedId(track.getUnmovedId())
                             			.setUnmovedGeohash(unmoved.getGeohash()).build();
                         })
+                .selectKey((trackingNumber, trackGeo) -> trackGeo.getMoverId()) // prepare to join on mover_id
                 .to(
                         TRACK_GEO_TOPIC,
                         Produced.with(Serdes.String(), trackGeoSerde));

@@ -9,6 +9,5 @@
   
   <modules>
     <module>unmoved-geo</module>
-    <module>track-geo-enricher</module>
   </modules>
 </project>
