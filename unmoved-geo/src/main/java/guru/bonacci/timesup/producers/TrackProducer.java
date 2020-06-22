@@ -15,24 +15,25 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import guru.bonacci.timesup.model.TheTrack.Track;
 import guru.bonacci.timesup.model.TheUnmoved.Unmoved;
 import reactor.core.publisher.Flux;
 import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderOptions;
 import reactor.kafka.sender.SenderRecord;
 
-public class UnmovedProducer {
+public class TrackProducer {
 
-    private static final Logger log = LoggerFactory.getLogger(UnmovedProducer.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(TrackProducer.class.getName());
 
-    static final String BOOTSTRAP_SERVERS = "localhost:29092";
+    static final String BOOTSTRAP_SERVERS = "localhost:9092";
     static final String SCHEMA_REGISTRY = "http://127.0.0.1:8081";
-    static final String TOPIC = "unmoved";
+    static final String TOPIC = "track-topic";
 
-    private final KafkaSender<String, Unmoved> sender;
+    private final KafkaSender<String, Track> sender;
     private final SimpleDateFormat dateFormat;
 
-    public UnmovedProducer(String bootstrapServers) {
+    public TrackProducer(String bootstrapServers) {
 
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -42,13 +43,12 @@ public class UnmovedProducer {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
         		  "io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer");
 		props.put("schema.registry.url", SCHEMA_REGISTRY);
-		SenderOptions<String, Unmoved> senderOptions = SenderOptions.create(props);
+		SenderOptions<String, Track> senderOptions = SenderOptions.create(props);
 
         sender = KafkaSender.create(senderOptions);
         dateFormat = new SimpleDateFormat("HH:mm:ss:SSS z dd MMM yyyy");
     }
 
-//	String loc = step.getLeft() + "," + step.getRight(); 
     public void sendMessages(String topic, CountDownLatch latch) throws InterruptedException {
         sender.send(Flux.interval(Duration.ofSeconds(1))
                         .map(i -> SenderRecord.create(toRecord(topic), i)))
@@ -65,11 +65,11 @@ public class UnmovedProducer {
               });
     }
 
-    ProducerRecord<String, Unmoved> toRecord(String topic) {
-    	String id = "bar";
-    	Unmoved record = Unmoved.newBuilder().setId(id).setLatitude(1.0f).setLongitude(1.0f).build();
+    ProducerRecord<String, Track> toRecord(String topic) {
+    	String nr = "bar2";
+    	Track record = Track.newBuilder().setTrackingNumber("something 3").setMoverId("").setUnmovedId(nr).build();
 //    	record = null;
-    	return new ProducerRecord<>(topic, id, record);
+    	return new ProducerRecord<>(topic, nr, record);
     }
 
     public void close() {
@@ -79,7 +79,7 @@ public class UnmovedProducer {
     public static void main(String[] args) throws Exception {
         int count = 1;
         CountDownLatch latch = new CountDownLatch(count);
-        UnmovedProducer producer = new UnmovedProducer(BOOTSTRAP_SERVERS);
+        TrackProducer producer = new TrackProducer(BOOTSTRAP_SERVERS);
         producer.sendMessages(TOPIC, latch);
         latch.await(5, TimeUnit.MINUTES);
         producer.close();

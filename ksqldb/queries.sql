@@ -13,7 +13,7 @@ CREATE STREAM unmoved_geo
   WITH (KAFKA_TOPIC = 'unmoved_geo',
         VALUE_FORMAT = 'protobuf',
         PARTITIONS = 1)
-  AS SELECT id, latitude, longitude, GEOHASH(latitude, longitude, 6) AS geohash
+  AS SELECT id, latitude, longitude, GEOHASH(latitude, longitude, 8) AS geohash
   FROM unmoved;
 
 CREATE TABLE unmoved_geo_t

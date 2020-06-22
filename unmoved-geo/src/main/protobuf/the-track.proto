@@ -6,7 +6,7 @@ option java_package = "guru.bonacci.timesup.model";
 option java_outer_classname = "TheTrack";
 
 message Track {
-  required string tracking_numer = 1;
+  required string tracking_number = 1;
   required string mover_id = 2;
   required string unmoved_id = 3;
 }

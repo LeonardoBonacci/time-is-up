@@ -1,14 +1,13 @@
 # time-is-up
 
-TODO
-- does a ktable row stay in the table after the underlying optic record has been 'removed'?
-- outer join trace_to_estimate and estimate_t
-- use GEO_DISTANCE for variable GEOHASH length
-- simplify messages
-- new version tile sink connector: expire = 2
-- bug: 1 mover with multiple tracks?
-- test tombstone deletes track
+TODO: simplify messages
+- bug tombstone/retention -> test with another table 'in the end'?
+- kstream app for join bug for join track-unmoved: globalktable
 - test tombstone deletes unmoved
+- kstream app for join bug for join trace-track: one to many
+- test tombstone deletes track
+- use GEO_DISTANCE for variable GEOHASH length
+- new version tile sink connector: expire = 2
 - design solution automatic 20 min delayed track delete at pickup: windowed join?
 - station-sink equivalent
 - order count query

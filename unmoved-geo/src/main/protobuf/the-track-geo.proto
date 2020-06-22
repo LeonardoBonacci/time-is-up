@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package timesup;
+
+option java_package = "guru.bonacci.timesup.model";
+option java_outer_classname = "TheTrackGeo";
+
+message TrackGeo {
+  required string tracking_number = 1;
+  required string mover_id = 2;
+  required string unmoved_id = 3;
+  required string unmoved_geohash = 4;
+}
