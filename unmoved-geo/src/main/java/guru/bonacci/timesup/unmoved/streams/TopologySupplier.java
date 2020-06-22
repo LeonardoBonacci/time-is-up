@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.streams;
+package guru.bonacci.timesup.unmoved.streams;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;

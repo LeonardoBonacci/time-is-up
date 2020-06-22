@@ -115,3 +115,11 @@ services:
     image: tile38/tile38:1.21.1
     ports:
       - "9851:9851"
+
+  source:
+    image: leonardobonacci/unmoved-geo-enricher:1.0
+    build:
+      context: unmoved-geo
+      dockerfile: src/main/docker/Dockerfile.${QUARKUS_MODE:-jvm}
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: localhost:9092

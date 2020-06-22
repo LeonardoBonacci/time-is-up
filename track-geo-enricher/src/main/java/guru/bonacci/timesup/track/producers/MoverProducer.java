@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.producers;
+package guru.bonacci.timesup.track.producers;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -15,25 +15,24 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import guru.bonacci.timesup.model.TheTrack.Track;
-import guru.bonacci.timesup.model.TheUnmoved.Unmoved;
+import guru.bonacci.timesup.model.TheMover.Mover;
 import reactor.core.publisher.Flux;
 import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderOptions;
 import reactor.kafka.sender.SenderRecord;
 
-public class TrackProducer {
+public class MoverProducer {
 
-    private static final Logger log = LoggerFactory.getLogger(TrackProducer.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(MoverProducer.class.getName());
 
-    static final String BOOTSTRAP_SERVERS = "localhost:9092";
+    static final String BOOTSTRAP_SERVERS = "localhost:29092";
     static final String SCHEMA_REGISTRY = "http://127.0.0.1:8081";
-    static final String TOPIC = "track-topic";
+    static final String TOPIC = "testmover";
 
-    private final KafkaSender<String, Track> sender;
+    private final KafkaSender<String, Mover> sender;
     private final SimpleDateFormat dateFormat;
 
-    public TrackProducer(String bootstrapServers) {
+    public MoverProducer(String bootstrapServers) {
 
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -43,12 +42,13 @@ public class TrackProducer {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
         		  "io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer");
 		props.put("schema.registry.url", SCHEMA_REGISTRY);
-		SenderOptions<String, Track> senderOptions = SenderOptions.create(props);
+		SenderOptions<String, Mover> senderOptions = SenderOptions.create(props);
 
         sender = KafkaSender.create(senderOptions);
         dateFormat = new SimpleDateFormat("HH:mm:ss:SSS z dd MMM yyyy");
     }
 
+//	String loc = step.getLeft() + "," + step.getRight(); 
     public void sendMessages(String topic, CountDownLatch latch) throws InterruptedException {
         sender.send(Flux.interval(Duration.ofSeconds(1))
                         .map(i -> SenderRecord.create(toRecord(topic), i)))
@@ -65,11 +65,10 @@ public class TrackProducer {
               });
     }
 
-    ProducerRecord<String, Track> toRecord(String topic) {
-    	String nr = "bar2";
-    	Track record = Track.newBuilder().setTrackingNumber("something 3").setMoverId("").setUnmovedId(nr).build();
+    ProducerRecord<String, Mover> toRecord(String topic) {
+    	Mover record = Mover.newBuilder().setId("foo").setLat(1.1f).setLon(1.0f).build();
 //    	record = null;
-    	return new ProducerRecord<>(topic, nr, record);
+    	return new ProducerRecord<>(topic, "foo", record);
     }
 
     public void close() {
@@ -79,7 +78,7 @@ public class TrackProducer {
     public static void main(String[] args) throws Exception {
         int count = 1;
         CountDownLatch latch = new CountDownLatch(count);
-        TrackProducer producer = new TrackProducer(BOOTSTRAP_SERVERS);
+        MoverProducer producer = new MoverProducer(BOOTSTRAP_SERVERS);
         producer.sendMessages(TOPIC, latch);
         latch.await(5, TimeUnit.MINUTES);
         producer.close();

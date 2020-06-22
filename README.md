@@ -1,7 +1,6 @@
 # time-is-up
 
 TODO: simplify messages
-- bug tombstone/retention -> test with another table 'in the end'?
 - kstream app for join bug for join track-unmoved: globalktable
 - test tombstone deletes unmoved
 - kstream app for join bug for join trace-track: one to many
