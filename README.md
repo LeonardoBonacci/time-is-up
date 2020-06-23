@@ -4,7 +4,7 @@ TODO: simplify messages
 - kstream app for join bug for join trace-track: one to many
 - test tombstone deletes track
 - use GEO_DISTANCE for variable GEOHASH length
-- new version tile sink connector: expire = 2
+- new version tile sink connector: expire = 1
 - design solution automatic 20 min delayed track delete at pickup: windowed join?
 - station-sink equivalent
 - order count query

@@ -17,7 +17,7 @@ CREATE STREAM unmoved_geo
 INSERT INTO unmoved (id, latitude, longitude) VALUES ('Torpedo7Albany', 1.0, 1.0);
 
 -- CREATE TABLE unmoved_geo_t
--- this has become part of a KStream app
+-- this has become part of a the track-enricher kstream app
 
 CREATE STREAM track
   (rowkey VARCHAR KEY,
