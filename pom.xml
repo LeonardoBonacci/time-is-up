@@ -6,8 +6,8 @@
   <artifactId>parent</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  
+
   <modules>
-    <module>unmoved-geo</module>
+    <module>track-enricher</module>
   </modules>
 </project>

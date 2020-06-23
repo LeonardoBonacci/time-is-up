@@ -7,8 +7,6 @@ CREATE STREAM unmoved
        KEY = 'id',
        PARTITIONS = 1);
 
-INSERT INTO unmoved (id, latitude, longitude) VALUES ('Torpedo7Albany', 1.0, 1.0);
-
 CREATE STREAM unmoved_geo
   WITH (KAFKA_TOPIC = 'unmoved_geo',
         VALUE_FORMAT = 'protobuf',
@@ -16,10 +14,11 @@ CREATE STREAM unmoved_geo
   AS SELECT id, latitude, longitude, GEOHASH(latitude, longitude, 8) AS geohash
   FROM unmoved;
 
+INSERT INTO unmoved (id, latitude, longitude) VALUES ('Torpedo7Albany', 1.0, 1.0);
+
 -- CREATE TABLE unmoved_geo_t
 -- this has become part of a KStream app
 
--- todo key on tracking_number
 CREATE STREAM track
   (rowkey VARCHAR KEY,
    tracking_number VARCHAR,
@@ -27,10 +26,10 @@ CREATE STREAM track
    unmoved_id VARCHAR)
 WITH (KAFKA_TOPIC = 'track',
      VALUE_FORMAT = 'protobuf',
-     KEY = 'unmoved_id',
+     KEY = 'tracking_number',
      PARTITIONS = 1);
 
-INSERT INTO track (rowkey, tracking_number, mover_id, unmoved_id) VALUES ('Torpedo7Albany', '3SABC1234567890', 'thisisme', 'Torpedo7Albany');
+INSERT INTO track (rowkey, tracking_number, mover_id, unmoved_id) VALUES ('3SABC1234567890', '3SABC1234567890', 'thisisme', 'Torpedo7Albany');
 
 -- CREATE STREAM track_geo
 -- this has become part of a KStream app

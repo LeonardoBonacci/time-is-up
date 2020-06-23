@@ -11,7 +11,7 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>unmoved-geo-enricher</artifactId>
+	<artifactId>track-enricher</artifactId>
 
 	<properties>
 		<surefire-plugin.version>2.22.0</surefire-plugin.version>

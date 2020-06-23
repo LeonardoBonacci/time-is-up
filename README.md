@@ -1,8 +1,6 @@
 # time-is-up
 
 TODO: simplify messages
-- kstream app for join bug for join track-unmoved: globalktable
-- test tombstone deletes unmoved
 - kstream app for join bug for join trace-track: one to many
 - test tombstone deletes track
 - use GEO_DISTANCE for variable GEOHASH length

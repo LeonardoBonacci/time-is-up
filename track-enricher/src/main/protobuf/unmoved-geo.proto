@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package timesup;
+
+option java_package = "guru.bonacci.timesup.model";
+option java_outer_classname = "UnmovedGeo";
+
+message ConnectDefault1 {
+  string ID = 1;
+  double LATITUDE = 2;
+  double LONGITUDE = 3;
+  string GEOHASH = 4;
+}
