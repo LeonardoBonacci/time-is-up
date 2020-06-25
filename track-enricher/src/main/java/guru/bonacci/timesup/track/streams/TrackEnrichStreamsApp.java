@@ -20,7 +20,9 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import guru.bonacci.timesup.model.UnmovedGeo;
 import io.confluent.kafka.streams.serdes.protobuf.KafkaProtobufSerde;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class TrackEnrichStreamsApp {
 
   static final String TRACK_TOPIC = "track";
@@ -35,7 +37,7 @@ public class TrackEnrichStreamsApp {
     final boolean doReset = true;
     
     final KafkaStreams streams =
-        createStreams(bootstrapServers, schemaRegistryUrl, "/tmp/unmoved-global-table");
+        createStreams(bootstrapServers, schemaRegistryUrl, "C:\\tmp\\unmoved-global-table");
 
     if (doReset) { 	   
     	streams.cleanUp();
@@ -50,8 +52,8 @@ public class TrackEnrichStreamsApp {
                                            final String stateDir) {
 
     final Properties streamsConfiguration = new Properties();
-    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, "track-enrichment-app");
-    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, "track-enrichment-client");
+    streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, "track-enrichment-app1");
+    streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, "track-enrichment-client1");
     streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
     streamsConfiguration.put(StreamsConfig.STATE_DIR_CONFIG, stateDir);
     streamsConfiguration.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -73,7 +75,8 @@ public class TrackEnrichStreamsApp {
 
     final KStream<String, guru.bonacci.timesup.model.Track.ConnectDefault1> trackStream = 
     		builder.stream(TRACK_TOPIC, Consumed.with(Serdes.String(), trackSerde));
-
+    trackStream.peek((k,v) -> log.info(k + " <> " + v));
+    
     final GlobalKTable<String, guru.bonacci.timesup.model.UnmovedGeo.ConnectDefault1>
         unmovedTable =
         builder.globalTable(UNMOVED_TOPIC, Materialized.<String, UnmovedGeo.ConnectDefault1, KeyValueStore<Bytes, byte[]>>as(UNMOVED_STORE)

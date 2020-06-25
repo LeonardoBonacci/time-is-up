@@ -1,13 +1,14 @@
 # time-is-up
 
-TODO: simplify messages
-- kstream app for join bug for join trace-track: one to many
-- test tombstone deletes track
+TODO:
 - use GEO_DISTANCE for variable GEOHASH length
-- new version tile sink connector: expire = 1
 - design solution automatic 20 min delayed track delete at pickup: windowed join?
 - station-sink equivalent
+- simplify messages
 - order count query
+- take care of protobuf pojo's: proto3?
+- fix bug connector expire
+- dockerize kstream apps
 
 - https://www.confluent.io/blog/importance-of-distributed-tracing-for-apache-kafka-based-applications/
 - https://github.com/openzipkin-contrib/brave-kafka-interceptor

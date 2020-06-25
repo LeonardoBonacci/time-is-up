@@ -46,7 +46,7 @@ public class SampleUnmovedGeoProducer {
 	void send() {
 		String key = "Torpedo7Albany";
 		ConnectDefault1 record = ConnectDefault1.newBuilder().setID(key).setLATITUDE(1.0).setLONGITUDE(2.0).setGEOHASH("s00twy01").build();
-//		record = null;
+//		record = null; //tombstone
 		
 		System.out.printf("Producing record: %s\t%s", key, record);
 		producer.send(new ProducerRecord<String, ConnectDefault1>(TOPIC, key, record), new Callback() {

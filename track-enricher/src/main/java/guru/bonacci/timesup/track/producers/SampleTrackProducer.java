@@ -45,9 +45,10 @@ public class SampleTrackProducer {
 
 	// Produce sample data
 	void send() {
-		String key = "thisisme";
-		ConnectDefault1 record = ConnectDefault1.newBuilder().setTRACKINGNUMBER("someLongNumber").setMOVERID("moverid2").setUNMOVEDID("Torpedo7Albany").build();
-
+		String key = "someLongNumber";
+		ConnectDefault1 record = ConnectDefault1.newBuilder().setTRACKINGNUMBER(key).setMOVERID("moverid").setUNMOVEDID("Torpedo7Albany").build();
+//		record = null; //tombstone
+		
 		System.out.printf("Producing record: %s\t%s", key, record);
 		producer.send(new ProducerRecord<String, ConnectDefault1>(TOPIC, key, record), new Callback() {
 			@Override
