@@ -65,6 +65,18 @@ public final class TrackGeo {
      */
     com.google.protobuf.ByteString
         getUNMOVEDGEOHASHBytes();
+
+    /**
+     * <code>float UNMOVED_LAT = 5;</code>
+     * @return The uNMOVEDLAT.
+     */
+    float getUNMOVEDLAT();
+
+    /**
+     * <code>float UNMOVED_LON = 6;</code>
+     * @return The uNMOVEDLON.
+     */
+    float getUNMOVEDLON();
   }
   /**
    * Protobuf type {@code timesup.ConnectDefault1}
@@ -137,6 +149,16 @@ public final class TrackGeo {
               java.lang.String s = input.readStringRequireUtf8();
 
               uNMOVEDGEOHASH_ = s;
+              break;
+            }
+            case 45: {
+
+              uNMOVEDLAT_ = input.readFloat();
+              break;
+            }
+            case 53: {
+
+              uNMOVEDLON_ = input.readFloat();
               break;
             }
             default: {
@@ -323,6 +345,28 @@ public final class TrackGeo {
       }
     }
 
+    public static final int UNMOVED_LAT_FIELD_NUMBER = 5;
+    private float uNMOVEDLAT_;
+    /**
+     * <code>float UNMOVED_LAT = 5;</code>
+     * @return The uNMOVEDLAT.
+     */
+    @java.lang.Override
+    public float getUNMOVEDLAT() {
+      return uNMOVEDLAT_;
+    }
+
+    public static final int UNMOVED_LON_FIELD_NUMBER = 6;
+    private float uNMOVEDLON_;
+    /**
+     * <code>float UNMOVED_LON = 6;</code>
+     * @return The uNMOVEDLON.
+     */
+    @java.lang.Override
+    public float getUNMOVEDLON() {
+      return uNMOVEDLON_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -349,6 +393,12 @@ public final class TrackGeo {
       if (!getUNMOVEDGEOHASHBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, uNMOVEDGEOHASH_);
       }
+      if (uNMOVEDLAT_ != 0F) {
+        output.writeFloat(5, uNMOVEDLAT_);
+      }
+      if (uNMOVEDLON_ != 0F) {
+        output.writeFloat(6, uNMOVEDLON_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -369,6 +419,14 @@ public final class TrackGeo {
       }
       if (!getUNMOVEDGEOHASHBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, uNMOVEDGEOHASH_);
+      }
+      if (uNMOVEDLAT_ != 0F) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(5, uNMOVEDLAT_);
+      }
+      if (uNMOVEDLON_ != 0F) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(6, uNMOVEDLON_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -393,6 +451,12 @@ public final class TrackGeo {
           .equals(other.getUNMOVEDID())) return false;
       if (!getUNMOVEDGEOHASH()
           .equals(other.getUNMOVEDGEOHASH())) return false;
+      if (java.lang.Float.floatToIntBits(getUNMOVEDLAT())
+          != java.lang.Float.floatToIntBits(
+              other.getUNMOVEDLAT())) return false;
+      if (java.lang.Float.floatToIntBits(getUNMOVEDLON())
+          != java.lang.Float.floatToIntBits(
+              other.getUNMOVEDLON())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -412,6 +476,12 @@ public final class TrackGeo {
       hash = (53 * hash) + getUNMOVEDID().hashCode();
       hash = (37 * hash) + UNMOVED_GEOHASH_FIELD_NUMBER;
       hash = (53 * hash) + getUNMOVEDGEOHASH().hashCode();
+      hash = (37 * hash) + UNMOVED_LAT_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(
+          getUNMOVEDLAT());
+      hash = (37 * hash) + UNMOVED_LON_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(
+          getUNMOVEDLON());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -553,6 +623,10 @@ public final class TrackGeo {
 
         uNMOVEDGEOHASH_ = "";
 
+        uNMOVEDLAT_ = 0F;
+
+        uNMOVEDLON_ = 0F;
+
         return this;
       }
 
@@ -583,6 +657,8 @@ public final class TrackGeo {
         result.mOVERID_ = mOVERID_;
         result.uNMOVEDID_ = uNMOVEDID_;
         result.uNMOVEDGEOHASH_ = uNMOVEDGEOHASH_;
+        result.uNMOVEDLAT_ = uNMOVEDLAT_;
+        result.uNMOVEDLON_ = uNMOVEDLON_;
         onBuilt();
         return result;
       }
@@ -646,6 +722,12 @@ public final class TrackGeo {
         if (!other.getUNMOVEDGEOHASH().isEmpty()) {
           uNMOVEDGEOHASH_ = other.uNMOVEDGEOHASH_;
           onChanged();
+        }
+        if (other.getUNMOVEDLAT() != 0F) {
+          setUNMOVEDLAT(other.getUNMOVEDLAT());
+        }
+        if (other.getUNMOVEDLON() != 0F) {
+          setUNMOVEDLON(other.getUNMOVEDLON());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -979,6 +1061,68 @@ public final class TrackGeo {
         onChanged();
         return this;
       }
+
+      private float uNMOVEDLAT_ ;
+      /**
+       * <code>float UNMOVED_LAT = 5;</code>
+       * @return The uNMOVEDLAT.
+       */
+      @java.lang.Override
+      public float getUNMOVEDLAT() {
+        return uNMOVEDLAT_;
+      }
+      /**
+       * <code>float UNMOVED_LAT = 5;</code>
+       * @param value The uNMOVEDLAT to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUNMOVEDLAT(float value) {
+        
+        uNMOVEDLAT_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>float UNMOVED_LAT = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearUNMOVEDLAT() {
+        
+        uNMOVEDLAT_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float uNMOVEDLON_ ;
+      /**
+       * <code>float UNMOVED_LON = 6;</code>
+       * @return The uNMOVEDLON.
+       */
+      @java.lang.Override
+      public float getUNMOVEDLON() {
+        return uNMOVEDLON_;
+      }
+      /**
+       * <code>float UNMOVED_LON = 6;</code>
+       * @param value The uNMOVEDLON to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUNMOVEDLON(float value) {
+        
+        uNMOVEDLON_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>float UNMOVED_LON = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearUNMOVEDLON() {
+        
+        uNMOVEDLON_ = 0F;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -1046,11 +1190,12 @@ public final class TrackGeo {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\017track-geo.proto\022\007timesup\"i\n\017ConnectDef" +
-      "ault1\022\027\n\017TRACKING_NUMBER\030\001 \001(\t\022\020\n\010MOVER_" +
-      "ID\030\002 \001(\t\022\022\n\nUNMOVED_ID\030\003 \001(\t\022\027\n\017UNMOVED_" +
-      "GEOHASH\030\004 \001(\tB&\n\032guru.bonacci.timesup.mo" +
-      "delB\010TrackGeob\006proto3"
+      "\n\017track-geo.proto\022\007timesup\"\223\001\n\017ConnectDe" +
+      "fault1\022\027\n\017TRACKING_NUMBER\030\001 \001(\t\022\020\n\010MOVER" +
+      "_ID\030\002 \001(\t\022\022\n\nUNMOVED_ID\030\003 \001(\t\022\027\n\017UNMOVED" +
+      "_GEOHASH\030\004 \001(\t\022\023\n\013UNMOVED_LAT\030\005 \001(\002\022\023\n\013U" +
+      "NMOVED_LON\030\006 \001(\002B&\n\032guru.bonacci.timesup" +
+      ".modelB\010TrackGeob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -1061,7 +1206,7 @@ public final class TrackGeo {
     internal_static_timesup_ConnectDefault1_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_timesup_ConnectDefault1_descriptor,
-        new java.lang.String[] { "TRACKINGNUMBER", "MOVERID", "UNMOVEDID", "UNMOVEDGEOHASH", });
+        new java.lang.String[] { "TRACKINGNUMBER", "MOVERID", "UNMOVEDID", "UNMOVEDGEOHASH", "UNMOVEDLAT", "UNMOVEDLON", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

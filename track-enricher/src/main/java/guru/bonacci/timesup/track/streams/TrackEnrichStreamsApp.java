@@ -107,7 +107,10 @@ public class TrackEnrichStreamsApp {
 			.setTRACKINGNUMBER(track.getTRACKINGNUMBER())
 			.setMOVERID(track.getMOVERID())
 			.setUNMOVEDID(track.getUNMOVEDID())
-			.setUNMOVEDGEOHASH(unmoved.getGEOHASH()).build();
+			.setUNMOVEDGEOHASH(unmoved.getGEOHASH())
+			.setUNMOVEDLAT(unmoved.getLAT())
+			.setUNMOVEDLON(unmoved.getLON())
+			.build();
 	 }
   }
 }

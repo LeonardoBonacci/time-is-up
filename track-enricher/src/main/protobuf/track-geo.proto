@@ -10,4 +10,6 @@ message ConnectDefault1 {
   string MOVER_ID = 2;
   string UNMOVED_ID = 3;
   string UNMOVED_GEOHASH = 4;
+  float UNMOVED_LAT = 5;
+  float UNMOVED_LON = 6;
 }

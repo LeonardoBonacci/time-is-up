@@ -1,7 +1,7 @@
 CREATE STREAM unmoved
  (id VARCHAR,
-  latitude DOUBLE,
-  longitude DOUBLE)
+  lat DOUBLE,
+  lon DOUBLE)
  WITH (KAFKA_TOPIC = 'unmoved',
        VALUE_FORMAT = 'protobuf',
        KEY = 'id',
@@ -11,7 +11,7 @@ CREATE STREAM unmoved_geo
   WITH (KAFKA_TOPIC = 'unmoved_geo',
         VALUE_FORMAT = 'protobuf',
         PARTITIONS = 1)
-  AS SELECT id, latitude, longitude, GEOHASH(latitude, longitude, 8) AS geohash
+  AS SELECT id, lat, lon, GEOHASH(lat, lon, 8) AS geohash
   FROM unmoved;
 
 CREATE SINK CONNECTOR tile WITH (
@@ -21,7 +21,7 @@ CREATE SINK CONNECTOR tile WITH (
     'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
     'value.converter' = 'io.confluent.connect.protobuf.ProtobufConverter',
     'value.converter.schema.registry.url' = 'http://schema-registry:8081',
-    'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LATITUDE event.LONGITUDE',
+    'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LAT event.LON',
     'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.LAT event.LON',
     'tile38.topic.trace.expire' = 5,
     'tile38.host' = 'tile38',
@@ -35,8 +35,8 @@ CREATE SINK CONNECTOR tile WITH (
 -- SETHOOK arrivals kafka://broker:29092/arrival_raw NEARBY trace FENCE NODWELL ROAM unmoved * 100
 INSERT INTO mover (id, lat, lon) VALUES ('moverid', 0.91, 0.99);
 
-INSERT INTO unmoved (id, latitude, longitude) VALUES ('Torpedo7Albany', 1.0, 1.0);
-INSERT INTO unmoved (id, latitude, longitude) VALUES ('TEST', 1.0, 1.0);
+INSERT INTO unmoved (id, lat, lon) VALUES ('Torpedo7Albany', 1.0, 1.0);
+INSERT INTO unmoved (id, lat, lon) VALUES ('TEST', 1.0, 1.0);
 
 
 -- CREATE TABLE unmoved_geo_t
@@ -46,7 +46,9 @@ CREATE STREAM track_geo
   (tracking_number VARCHAR,
    mover_id VARCHAR,
    unmoved_id VARCHAR,
-   unmoved_geohash VARCHAR)
+   unmoved_geohash VARCHAR,
+   unmoved_lat DOUBLE,
+   unmoved_lon DOUBLE)
 WITH (KAFKA_TOPIC = 'track_geo',
      VALUE_FORMAT = 'protobuf',
      KEY = 'mover_id');
@@ -60,6 +62,13 @@ CREATE STREAM mover
         KEY = 'id',
         PARTITIONS = 1);
 
+-- GEOHASH MEANING
+--4 -> 39.1km x 19.5km
+--5 -> 4.9km x 4.9km
+--6 -> 1.2km x 609.4m
+--7 -> 152.9m x 152.4m
+--8 -> 38.2m x 19m
+
 -- to facilitate filtering we join stream-stream and allow 24 hours of tracing
 -- after the track has been registred
 CREATE STREAM trace_unfiltered
@@ -68,9 +77,15 @@ CREATE STREAM trace_unfiltered
         PARTITIONS = 1)
   AS SELECT
           mover.id AS mover_id,
-          mover.lat AS lat,
-          mover.lon AS lon,
-          GEOHASH(mover.lat, mover.lon, 6) AS mover_geohash,
+          mover.lat AS mover_lat,
+          mover.lon AS mover_lon,
+          CASE
+              WHEN GEO_DISTANCE(mover.lat, mover.lon, track.unmoved_lat, track.unmoved_lon) < 1 THEN GEOHASH(lat, lon, 8)
+              WHEN GEO_DISTANCE(mover.lat, mover.lon, track.unmoved_lat, track.unmoved_lon) < 10 THEN GEOHASH(lat, lon, 7)
+              WHEN GEO_DISTANCE(mover.lat, mover.lon, track.unmoved_lat, track.unmoved_lon) < 50 THEN GEOHASH(lat, lon, 6)
+              WHEN GEO_DISTANCE(mover.lat, mover.lon, track.unmoved_lat, track.unmoved_lon) < 100 THEN GEOHASH(lat, lon, 5)
+              ELSE GEOHASH(lat, lon, 4)
+          END AS mover_geohash,
           track.tracking_number AS tracking_number,
           track.unmoved_id AS unmoved_id,
           track.unmoved_geohash AS unmoved_geohash

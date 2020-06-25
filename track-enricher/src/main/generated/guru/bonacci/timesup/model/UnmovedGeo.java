@@ -31,16 +31,16 @@ public final class UnmovedGeo {
         getIDBytes();
 
     /**
-     * <code>double LATITUDE = 2;</code>
-     * @return The lATITUDE.
+     * <code>float LAT = 2;</code>
+     * @return The lAT.
      */
-    double getLATITUDE();
+    float getLAT();
 
     /**
-     * <code>double LONGITUDE = 3;</code>
-     * @return The lONGITUDE.
+     * <code>float LON = 3;</code>
+     * @return The lON.
      */
-    double getLONGITUDE();
+    float getLON();
 
     /**
      * <code>string GEOHASH = 4;</code>
@@ -107,14 +107,14 @@ public final class UnmovedGeo {
               iD_ = s;
               break;
             }
-            case 17: {
+            case 21: {
 
-              lATITUDE_ = input.readDouble();
+              lAT_ = input.readFloat();
               break;
             }
-            case 25: {
+            case 29: {
 
-              lONGITUDE_ = input.readDouble();
+              lON_ = input.readFloat();
               break;
             }
             case 34: {
@@ -193,26 +193,26 @@ public final class UnmovedGeo {
       }
     }
 
-    public static final int LATITUDE_FIELD_NUMBER = 2;
-    private double lATITUDE_;
+    public static final int LAT_FIELD_NUMBER = 2;
+    private float lAT_;
     /**
-     * <code>double LATITUDE = 2;</code>
-     * @return The lATITUDE.
+     * <code>float LAT = 2;</code>
+     * @return The lAT.
      */
     @java.lang.Override
-    public double getLATITUDE() {
-      return lATITUDE_;
+    public float getLAT() {
+      return lAT_;
     }
 
-    public static final int LONGITUDE_FIELD_NUMBER = 3;
-    private double lONGITUDE_;
+    public static final int LON_FIELD_NUMBER = 3;
+    private float lON_;
     /**
-     * <code>double LONGITUDE = 3;</code>
-     * @return The lONGITUDE.
+     * <code>float LON = 3;</code>
+     * @return The lON.
      */
     @java.lang.Override
-    public double getLONGITUDE() {
-      return lONGITUDE_;
+    public float getLON() {
+      return lON_;
     }
 
     public static final int GEOHASH_FIELD_NUMBER = 4;
@@ -270,11 +270,11 @@ public final class UnmovedGeo {
       if (!getIDBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, iD_);
       }
-      if (lATITUDE_ != 0D) {
-        output.writeDouble(2, lATITUDE_);
+      if (lAT_ != 0F) {
+        output.writeFloat(2, lAT_);
       }
-      if (lONGITUDE_ != 0D) {
-        output.writeDouble(3, lONGITUDE_);
+      if (lON_ != 0F) {
+        output.writeFloat(3, lON_);
       }
       if (!getGEOHASHBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, gEOHASH_);
@@ -291,13 +291,13 @@ public final class UnmovedGeo {
       if (!getIDBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, iD_);
       }
-      if (lATITUDE_ != 0D) {
+      if (lAT_ != 0F) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(2, lATITUDE_);
+          .computeFloatSize(2, lAT_);
       }
-      if (lONGITUDE_ != 0D) {
+      if (lON_ != 0F) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(3, lONGITUDE_);
+          .computeFloatSize(3, lON_);
       }
       if (!getGEOHASHBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, gEOHASH_);
@@ -319,12 +319,12 @@ public final class UnmovedGeo {
 
       if (!getID()
           .equals(other.getID())) return false;
-      if (java.lang.Double.doubleToLongBits(getLATITUDE())
-          != java.lang.Double.doubleToLongBits(
-              other.getLATITUDE())) return false;
-      if (java.lang.Double.doubleToLongBits(getLONGITUDE())
-          != java.lang.Double.doubleToLongBits(
-              other.getLONGITUDE())) return false;
+      if (java.lang.Float.floatToIntBits(getLAT())
+          != java.lang.Float.floatToIntBits(
+              other.getLAT())) return false;
+      if (java.lang.Float.floatToIntBits(getLON())
+          != java.lang.Float.floatToIntBits(
+              other.getLON())) return false;
       if (!getGEOHASH()
           .equals(other.getGEOHASH())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
@@ -340,12 +340,12 @@ public final class UnmovedGeo {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + ID_FIELD_NUMBER;
       hash = (53 * hash) + getID().hashCode();
-      hash = (37 * hash) + LATITUDE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          java.lang.Double.doubleToLongBits(getLATITUDE()));
-      hash = (37 * hash) + LONGITUDE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          java.lang.Double.doubleToLongBits(getLONGITUDE()));
+      hash = (37 * hash) + LAT_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(
+          getLAT());
+      hash = (37 * hash) + LON_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(
+          getLON());
       hash = (37 * hash) + GEOHASH_FIELD_NUMBER;
       hash = (53 * hash) + getGEOHASH().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -483,9 +483,9 @@ public final class UnmovedGeo {
         super.clear();
         iD_ = "";
 
-        lATITUDE_ = 0D;
+        lAT_ = 0F;
 
-        lONGITUDE_ = 0D;
+        lON_ = 0F;
 
         gEOHASH_ = "";
 
@@ -516,8 +516,8 @@ public final class UnmovedGeo {
       public guru.bonacci.timesup.model.UnmovedGeo.ConnectDefault1 buildPartial() {
         guru.bonacci.timesup.model.UnmovedGeo.ConnectDefault1 result = new guru.bonacci.timesup.model.UnmovedGeo.ConnectDefault1(this);
         result.iD_ = iD_;
-        result.lATITUDE_ = lATITUDE_;
-        result.lONGITUDE_ = lONGITUDE_;
+        result.lAT_ = lAT_;
+        result.lON_ = lON_;
         result.gEOHASH_ = gEOHASH_;
         onBuilt();
         return result;
@@ -571,11 +571,11 @@ public final class UnmovedGeo {
           iD_ = other.iD_;
           onChanged();
         }
-        if (other.getLATITUDE() != 0D) {
-          setLATITUDE(other.getLATITUDE());
+        if (other.getLAT() != 0F) {
+          setLAT(other.getLAT());
         }
-        if (other.getLONGITUDE() != 0D) {
-          setLONGITUDE(other.getLONGITUDE());
+        if (other.getLON() != 0F) {
+          setLON(other.getLON());
         }
         if (!other.getGEOHASH().isEmpty()) {
           gEOHASH_ = other.gEOHASH_;
@@ -686,64 +686,64 @@ public final class UnmovedGeo {
         return this;
       }
 
-      private double lATITUDE_ ;
+      private float lAT_ ;
       /**
-       * <code>double LATITUDE = 2;</code>
-       * @return The lATITUDE.
+       * <code>float LAT = 2;</code>
+       * @return The lAT.
        */
       @java.lang.Override
-      public double getLATITUDE() {
-        return lATITUDE_;
+      public float getLAT() {
+        return lAT_;
       }
       /**
-       * <code>double LATITUDE = 2;</code>
-       * @param value The lATITUDE to set.
+       * <code>float LAT = 2;</code>
+       * @param value The lAT to set.
        * @return This builder for chaining.
        */
-      public Builder setLATITUDE(double value) {
+      public Builder setLAT(float value) {
         
-        lATITUDE_ = value;
+        lAT_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>double LATITUDE = 2;</code>
+       * <code>float LAT = 2;</code>
        * @return This builder for chaining.
        */
-      public Builder clearLATITUDE() {
+      public Builder clearLAT() {
         
-        lATITUDE_ = 0D;
+        lAT_ = 0F;
         onChanged();
         return this;
       }
 
-      private double lONGITUDE_ ;
+      private float lON_ ;
       /**
-       * <code>double LONGITUDE = 3;</code>
-       * @return The lONGITUDE.
+       * <code>float LON = 3;</code>
+       * @return The lON.
        */
       @java.lang.Override
-      public double getLONGITUDE() {
-        return lONGITUDE_;
+      public float getLON() {
+        return lON_;
       }
       /**
-       * <code>double LONGITUDE = 3;</code>
-       * @param value The lONGITUDE to set.
+       * <code>float LON = 3;</code>
+       * @param value The lON to set.
        * @return This builder for chaining.
        */
-      public Builder setLONGITUDE(double value) {
+      public Builder setLON(float value) {
         
-        lONGITUDE_ = value;
+        lON_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>double LONGITUDE = 3;</code>
+       * <code>float LON = 3;</code>
        * @return This builder for chaining.
        */
-      public Builder clearLONGITUDE() {
+      public Builder clearLON() {
         
-        lONGITUDE_ = 0D;
+        lON_ = 0F;
         onChanged();
         return this;
       }
@@ -890,11 +890,10 @@ public final class UnmovedGeo {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021unmoved-geo.proto\022\007timesup\"S\n\017ConnectD" +
-      "efault1\022\n\n\002ID\030\001 \001(\t\022\020\n\010LATITUDE\030\002 \001(\001\022\021\n" +
-      "\tLONGITUDE\030\003 \001(\001\022\017\n\007GEOHASH\030\004 \001(\tB(\n\032gur" +
-      "u.bonacci.timesup.modelB\nUnmovedGeob\006pro" +
-      "to3"
+      "\n\021unmoved-geo.proto\022\007timesup\"H\n\017ConnectD" +
+      "efault1\022\n\n\002ID\030\001 \001(\t\022\013\n\003LAT\030\002 \001(\002\022\013\n\003LON\030" +
+      "\003 \001(\002\022\017\n\007GEOHASH\030\004 \001(\tB(\n\032guru.bonacci.t" +
+      "imesup.modelB\nUnmovedGeob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -905,7 +904,7 @@ public final class UnmovedGeo {
     internal_static_timesup_ConnectDefault1_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_timesup_ConnectDefault1_descriptor,
-        new java.lang.String[] { "ID", "LATITUDE", "LONGITUDE", "GEOHASH", });
+        new java.lang.String[] { "ID", "LAT", "LON", "GEOHASH", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

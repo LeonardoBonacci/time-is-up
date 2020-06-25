@@ -7,7 +7,7 @@ option java_outer_classname = "UnmovedGeo";
 
 message ConnectDefault1 {
   string ID = 1;
-  double LATITUDE = 2;
-  double LONGITUDE = 3;
+  float LAT = 2;
+  float LON = 3;
   string GEOHASH = 4;
 }
