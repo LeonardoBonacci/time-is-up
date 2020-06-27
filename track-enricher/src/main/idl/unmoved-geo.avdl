@@ -1,0 +1,10 @@
+@namespace("guru.bonacci.timesup.model")
+protocol Unmoveds {
+
+  record UnmovedGeo {
+    string id;
+    float lat;
+    float lon;
+    string geohash;
+  }
+}

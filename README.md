@@ -1,10 +1,11 @@
 # time-is-up
 
 TODO:
-- design solution automatic 20 min delayed track delete at pickup: windowed join?
-- station-sink equivalent
+- take care of protobuf pojo's: proto3? or change to avro
+- delete 20 min after arrival
 - order count query
-- take care of protobuf pojo's: proto3?
+- self eval query
+- station-sink equivalent
 - fix bug connector expire
 - dockerize kstream apps
 

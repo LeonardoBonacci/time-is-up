@@ -97,8 +97,9 @@ services:
       KSQL_CONNECT_REST_ADVERTISED_HOST_NAME: ksqldb-server
       KSQL_KSQL_EXTENTION_DIR: "/usr/ext"
     volumes:
-      - ./confluent-hub-components/leonardobonacci-kafka-connect-tile38-sink:/usr/share/kafka/plugins/tile38
+      - ./confluent-hub-components:/usr/share/kafka/plugins
       - ./ksqldb:/usr/ext #mounts a custom UDF jar for ksql
+      - ./datagen:/tmp
 
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.9.0

@@ -9,4 +9,5 @@ message ConnectDefault1 {
   string TRACKING_NUMBER = 1;
   string MOVER_ID = 2;
   string UNMOVED_ID = 3;
+  string MOVED_UNMOVED_ID = 4;
 }

@@ -1,0 +1,18 @@
+{
+  "namespace": "guru.bonacci.timesup.model",
+  "name": "ticker",
+  "type": "record",
+  "fields": [
+    {
+      "name": "tock",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [
+            "42"
+          ]
+        }
+      }
+    }
+  ]
+}

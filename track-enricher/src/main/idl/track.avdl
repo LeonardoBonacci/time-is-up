@@ -1,0 +1,18 @@
+@namespace("guru.bonacci.timesup.model")
+protocol Tracks {
+
+  record TrackGeo {
+    string tracking_number;
+    string mover_id;
+    string unmoved_id;
+    string unmoved_geohash;
+    float unmoved_lat;
+    float unmoved_lon;
+  }
+
+  record Track {
+    string tracking_number;
+    string mover_id;
+    string unmoved_id;
+  }
+}
