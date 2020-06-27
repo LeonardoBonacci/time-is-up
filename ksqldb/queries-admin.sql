@@ -3,22 +3,16 @@
 
 -- query self evaluation of estimates
 
--- log.cleaner.threads = 10
--- use LogAppendTime
 -- query for automatic track delete after pickup
-CREATE STREAM count_down
-  WITH (KAFKA_TOPIC = 'count_down',
+CREATE STREAM countdown
+  WITH (KAFKA_TOPIC = 'countdown',
         TIMESTAMP = 'cleanup_time',
         VALUE_FORMAT = 'protobuf',
         PARTITIONS = 1)
-  AS SELECT id, tracking_number, rowtime + 180000 AS cleanup_time -- add three minutes for testing
+  AS SELECT id, tracking_number, rowtime + 120000 AS cleanup_time -- two minutes for testing
   FROM pickup;
 
 -- count_down has messages with future timestamp
--- use LogAppendTime
--- stopwach datagen connector
--- kstream-app join with time window within 3 minutes
--- inserts tombstone messages in track
 
 CREATE SOURCE CONNECTOR ticker WITH (
     'tasks.max' = '1',
@@ -27,5 +21,6 @@ CREATE SOURCE CONNECTOR ticker WITH (
     'schema.filename' = '/tmp/ticker.avro',
     'schema.keyfield' = 'tock',
     'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
-    'value.converter' = 'org.apache.kafka.connect.storage.StringConverter',
+    'value.converter' = 'io.confluent.connect.avro.AvroConverter',
+    'value.converter.schema.registry.url' = 'http://schema-registry:8081',
     'max.interval' = 1000);

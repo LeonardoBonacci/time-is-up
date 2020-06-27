@@ -21,7 +21,7 @@ CREATE SINK CONNECTOR tile WITH (
     'connector.class' = 'guru.bonacci.kafka.connect.tile38.Tile38SinkConnector',
     'topics' = 'unmoved,trace',
     'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
-    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    'value.converter': 'io.confluent.connect.avro.AvroConverter',
     'value.converter.schema.registry.url' = 'http://schema-registry:8081',
     'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LAT event.LON',
     'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.LAT event.LON',
