@@ -44,7 +44,7 @@ public class SampleTrackProducer {
 
 	// Produce sample data
 	void send() {
-		String key = "someLongNumber";
+		String key = "moverid";
 		Track record = Track.newBuilder().setTrackingNumber(key).setMoverId("moverid").setUnmovedId("Torpedo7Albany").build();
 //		record = null; //tombstone
 		

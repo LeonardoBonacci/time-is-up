@@ -57,12 +57,14 @@ public class TrackCleaningApp {
 
     final KStream<String, GenericRecord> tickerStream = builder.stream(TICKER_TOPIC);
     final KStream<String, GenericRecord> countdownStream = builder.stream(COUNTDOWN_TOPIC);
-
+    countdownStream.peek((k,v) -> System.out.println("" + v));
+    
 	tickerStream.join(countdownStream,
-					 (t, c) -> c.get("tracking_number"),
+					 (t, c) -> c.get("TRACKING_NUMBER"),
 					 (JoinWindows.of(Duration.ofSeconds(1))))
-				.map((k, v) -> new KeyValue<>(v, null)) // tombstone
-			    .peek((k,v) -> log.trace("cleaning track {}", k))
+				.peek((k,v) -> System.out.println("cleaning track " + v))
+				.map((k, v) -> new KeyValue<>(v.toString(), null)) // tombstone
+				.peek((k,v) -> System.out.println("cleaning track " + k))
 				.to(TRACK_TOPIC);
     
     return new KafkaStreams(builder.build(), config);

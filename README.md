@@ -11,3 +11,7 @@ TODO:
 
 - https://www.confluent.io/blog/importance-of-distributed-tracing-for-apache-kafka-based-applications/
 - https://github.com/openzipkin-contrib/brave-kafka-interceptor
+
+
+altitude geofencing?
+tracing zipkin
