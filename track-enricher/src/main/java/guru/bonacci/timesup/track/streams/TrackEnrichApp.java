@@ -61,18 +61,18 @@ public class TrackEnrichApp {
     final StreamsBuilder builder = new StreamsBuilder();
 
     final KStream<String, Track> trackStream = builder.stream(TRACK_TOPIC);
-    trackStream.peek((k,v) -> log.info(k + " <> " + v));
+    trackStream.peek((k,v) -> System.out.println(k + " <> " + v));
 
     final GlobalKTable<String, UnmovedGeo> unmovedTable = 
     		builder.globalTable(UNMOVED_TOPIC, Materialized.as(UNMOVED_STORE));
 
     final KStream<String, TrackGeo> enrichedTrackStream = 
     		trackStream.join(unmovedTable,
-    						(trackNumber, track) -> track.getUnmovedId(),
+    						(trackNumber, track) -> track.getUNMOVEDID(),
 	    					 (track, unmoved) -> new JoinHelper(track, unmoved).build());
     
     enrichedTrackStream
-    	.selectKey((trackingNumber, trackGeo) -> trackGeo.getMoverId())
+    	.selectKey((trackingNumber, trackGeo) -> trackGeo.getMOVERID())
     	.to(ENRICHED_TRACK_TOPIC);
 
     return new KafkaStreams(builder.build(), config);
@@ -87,12 +87,12 @@ public class TrackEnrichApp {
 
 	 TrackGeo build() {
 		 return TrackGeo.newBuilder()
-			.setTrackingNumber(track.getTrackingNumber())
-			.setMoverId(track.getMoverId())
-			.setUnmovedId(track.getUnmovedId())
-			.setUnmovedGeohash(unmoved.getGeohash())
-			.setUnmovedLat(unmoved.getLat())
-			.setUnmovedLon(unmoved.getLon())
+			.setTRACKINGNUMBER(track.getTRACKINGNUMBER())
+			.setMOVERID(track.getMOVERID())
+			.setUNMOVEDID(track.getUNMOVEDID())
+			.setUNMOVEDGEOHASH(unmoved.getGEOHASH())
+			.setUNMOVEDLAT(unmoved.getLAT())
+			.setUNMOVEDLON(unmoved.getLON())
 			.build();
 	 }
   }

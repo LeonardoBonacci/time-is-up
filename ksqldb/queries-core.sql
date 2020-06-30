@@ -4,45 +4,22 @@ CREATE STREAM unmoved
   lon DOUBLE)
  WITH (KAFKA_TOPIC = 'unmoved',
        VALUE_FORMAT = 'avro',
-       VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Unmoved'
+       VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Unmoved',
        KEY = 'id',
        PARTITIONS = 1);
 
 CREATE STREAM unmoved_geo
   WITH (KAFKA_TOPIC = 'unmoved_geo',
         VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.UnmovedGeo'
+        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.UnmovedGeo',
         PARTITIONS = 1)
   AS SELECT id, lat, lon, GEOHASH(lat, lon, 8) AS geohash
   FROM unmoved;
 
-CREATE SINK CONNECTOR tile WITH (
-    'tasks.max' = '1',
-    'connector.class' = 'guru.bonacci.kafka.connect.tile38.Tile38SinkConnector',
-    'topics' = 'unmoved,trace',
-    'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
-    'value.converter': 'io.confluent.connect.avro.AvroConverter',
-    'value.converter.schema.registry.url' = 'http://schema-registry:8081',
-    'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LAT event.LON',
-    'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.LAT event.LON',
-    'tile38.topic.trace.expire' = 5,
-    'tile38.host' = 'tile38',
-    'tile38.port' = 9851,
-    'errors.tolerance' = 'all',
-    'errors.log.enable' = true,
-    'errors.log.include.messages' = true);
-
--- topic arrival_raw: message.timestamp.type.LogAppendTime
--- docker run --net=host -it tile38/tile38 tile38-cli
--- SETHOOK arrivals kafka://broker:29092/arrival_raw NEARBY trace FENCE NODWELL ROAM unmoved * 100
-INSERT INTO mover (id, lat, lon) VALUES ('moverid', 0.91, 0.99);
-
 INSERT INTO unmoved (id, lat, lon) VALUES ('Torpedo7Albany', 1.0, 1.0);
-INSERT INTO unmoved (id, lat, lon) VALUES ('TEST', 1.0, 1.0);
+INSERT INTO unmoved (id, lat, lon) VALUES ('TEST', 10.0, -10.0);
 
-
--- CREATE TABLE unmoved_geo_t
--- this has become part of a the track-enricher kstream app
+-- 'CREATE TABLE unmoved_geo_t' has become part of the track-enricher kstream-app
 
 CREATE STREAM track_geo
   (tracking_number VARCHAR,
@@ -53,6 +30,7 @@ CREATE STREAM track_geo
    unmoved_lon DOUBLE)
 WITH (KAFKA_TOPIC = 'track_geo',
      VALUE_FORMAT = 'avro',
+     VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.TrackGeo',
      KEY = 'mover_id');
 
 CREATE STREAM mover
@@ -61,9 +39,11 @@ CREATE STREAM mover
    lon DOUBLE)
   WITH (KAFKA_TOPIC='mover',
         VALUE_FORMAT='avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Mover'
+        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Mover',
         KEY = 'id',
         PARTITIONS = 1);
+
+INSERT INTO mover (id, lat, lon) VALUES ('moverid', 0.90, 0.90);
 
 -- GEOHASH MEANING
 --4 -> 39.1km x 19.5km
@@ -75,9 +55,9 @@ CREATE STREAM mover
 -- to facilitate filtering we join stream-stream and allow 24 hours of tracing
 -- after the track has been registred
 CREATE STREAM trace_unfiltered
-  WITH (VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.TraceUnfiltered'
-        KAFKA_TOPIC = 'trace_unfiltered',
+  WITH (KAFKA_TOPIC = 'trace_unfiltered',
+        VALUE_FORMAT = 'avro',
+        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Trace'
         PARTITIONS = 1)
   AS SELECT
           mover.id AS mover_id,
@@ -114,29 +94,53 @@ CREATE TABLE track_t
 
 -- include 'trace in progress' and exclude 'trace no longer in progress'
 CREATE STREAM trace
-   WITH (VALUE_FORMAT = 'avro',
-         VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Trace'
-         KAFKA_TOPIC = 'trace',
-         PARTITIONS = 1)
-   AS SELECT
-           trace.mover_id AS mover_id,
-           trace.lat AS lat,
-           trace.lon as lon,
-           trace.mover_geohash AS mover_geohash,
-           trace.tracking_number AS tracking_number,
-           trace.unmoved_id AS unmoved_id,
-           track.unmoved_lat AS unmoved_lat,
-           track.unmoved_lon AS unmoved_lon,
-           trace.unmoved_geohash AS unmoved_geohash
-   FROM trace_unfiltered AS trace
-   INNER JOIN track_t AS track ON trace.tracking_number = track.tracking_number
-   PARTITION BY trace.mover_id;
+  WITH (KAFKA_TOPIC = 'trace',
+        VALUE_FORMAT = 'avro',
+        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Trace',
+        PARTITIONS = 1)
+  AS SELECT
+          trace.mover_id AS mover_id,
+          trace.mover_lat AS mover_lat,
+          trace.mover_lon as mover_lon,
+          trace.mover_geohash AS mover_geohash,
+          trace.tracking_number AS tracking_number,
+          trace.unmoved_id AS unmoved_id,
+          trace.unmoved_lat AS unmoved_lat,
+          trace.unmoved_lon AS unmoved_lon,
+          trace.unmoved_geohash AS unmoved_geohash
+  FROM trace_unfiltered AS trace
+  INNER JOIN track_t AS track ON trace.tracking_number = track.tracking_number
+  PARTITION BY trace.mover_id;
 
-INSERT INTO mover (id, lat, lon) VALUES ('moverid', -10.61, 0.94);
+/**
+./kafka-avro-console-consumer \
+    --bootstrap-server localhost:9092 \
+    --property schema.registry.url=http://localhost:8081 \
+    --topic trace \
+    --from-beginning
+*/
+
 INSERT INTO mover (id, lat, lon) VALUES ('moverid', 0.71, 0.96);
-INSERT INTO mover (id, lat, lon) VALUES ('moverid', 0.81, 0.98);
-INSERT INTO mover (id, lat, lon) VALUES ('moverid', 0.91, 0.99);
 INSERT INTO mover (id, lat, lon) VALUES ('moverid', 1.0, 1.0);
+
+CREATE SINK CONNECTOR tile WITH (
+    'tasks.max' = '1',
+    'connector.class' = 'guru.bonacci.kafka.connect.tile38.Tile38SinkConnector',
+    'topics' = 'unmoved,trace',
+    'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
+    'value.converter' = 'io.confluent.connect.avro.AvroConverter',
+    'value.converter.schema.registry.url' = 'http://schema-registry:8081',
+    'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LAT event.LON',
+    'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.MOVER_LAT event.MOVER_LON',
+    'tile38.host' = 'tile38',
+    'tile38.port' = 9851,
+    'errors.tolerance' = 'all',
+    'errors.log.enable' = true,
+    'errors.log.include.messages' = true);
+
+-- topic arrival_raw: message.timestamp.type.LogAppendTime
+-- docker run --net=host -it tile38/tile38 tile38-cli
+-- SETHOOK arrivals kafka://broker:29092/arrival_raw NEARBY trace FENCE NODWELL ROAM unmoved * 100
 
 
 CREATE STREAM arrival_raw (id STRING, nearby STRUCT<id STRING>)
@@ -145,9 +149,9 @@ CREATE STREAM arrival_raw (id STRING, nearby STRUCT<id STRING>)
 
 -- 'nearby is not null' filters out the faraway messages
 CREATE STREAM arrival
-  WITH (VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Arrival'
-        KAFKA_TOPIC = 'arrival',
+  WITH (KAFKA_TOPIC = 'arrival',
+        VALUE_FORMAT = 'avro',
+        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Arrival',
         PARTITIONS = 1)
   AS SELECT id as mover_id,
           nearby->id as unmoved_id
@@ -157,40 +161,40 @@ CREATE STREAM arrival
 
 -- this stream can be used for multiple estimation algorithms
 CREATE STREAM pickup
-    WITH (VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Pickup'
-        KAFKA_TOPIC = 'pickup',
+  WITH (KAFKA_TOPIC = 'pickup',
+        VALUE_FORMAT = 'avro',
+        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Pickup',
         PARTITIONS = 1)
     AS SELECT
       trace.mover_id AS mover_id,
-      trace.lat AS lat,
-      trace.lon as lon,
+      trace.mover_lat AS mover_lat,
+      trace.mover_lon as mover_lon,
       trace.mover_geohash AS mover_geohash,
       trace.tracking_number AS tracking_number,
       trace.unmoved_id AS unmoved_id,
-      track.unmoved_lat AS unmoved_lat,
-      track.unmoved_lon AS unmoved_lon,
+      trace.unmoved_lat AS unmoved_lat,
+      trace.unmoved_lon AS unmoved_lon,
       trace.unmoved_geohash AS unmoved_geohash,
       arrival.rowtime - trace.rowtime as togo_ms
     FROM trace AS trace
     INNER JOIN arrival as arrival WITHIN (0 MILLISECONDS, 1 HOUR) ON arrival.mover_id = trace.mover_id
     WHERE arrival.unmoved_id = trace.unmoved_id;
 
-CREATE STREAM geohash_avg_estimate
+CREATE STREAM geohash_estimate
   WITH (VALUE_FORMAT = 'avro',
-      VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Something'
-      KAFKA_TOPIC = 'pickup', -- new topic needed?
+      KAFKA_TOPIC = 'geohash_estimate',
+      VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.GeohashEstimate',
       PARTITIONS = 1)
   AS SELECT
-    arrival.rowtime - trace.rowtime as togo_ms,
+    pickup.togo_ms as togo_ms,
     mover_geohash + '/' + unmoved_geohash as hashkey
   FROM pickup
   PARTITION BY (mover_geohash + '/' + unmoved_geohash);
 
 CREATE TABLE geohash_avg_estimate_t
-    WITH (VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Something'
-        KAFKA_TOPIC = 'geohash_avg_estimate', -- new topic needed?
+  WITH (KAFKA_TOPIC = 'geohash_avg_estimate',
+        VALUE_FORMAT = 'avro',
+        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.GeohashAvgEstimate',
         PARTITIONS = 1)
     AS SELECT hashkey,
       AVG(togo_ms) as togo_ms

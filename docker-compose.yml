@@ -113,6 +113,6 @@ services:
 
   # THEN THE OTHER STUFF
   tile38:
-    image: tile38/tile38:1.21.1
+    image: tile38/tile38:edge
     ports:
       - "9851:9851"

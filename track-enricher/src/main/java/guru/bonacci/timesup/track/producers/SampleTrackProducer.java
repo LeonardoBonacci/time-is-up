@@ -44,8 +44,8 @@ public class SampleTrackProducer {
 
 	// Produce sample data
 	void send() {
-		String key = "moverid";
-		Track record = Track.newBuilder().setTrackingNumber(key).setMoverId("moverid").setUnmovedId("Torpedo7Albany").build();
+		String key = "foo";
+		Track record = Track.newBuilder().setTRACKINGNUMBER(key).setMOVERID("moverid").setUNMOVEDID("Torpedo7Albany").build();
 //		record = null; //tombstone
 		
 		System.out.printf("Producing record: %s\t%s", key, record);

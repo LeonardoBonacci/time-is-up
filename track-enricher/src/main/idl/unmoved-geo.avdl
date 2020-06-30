@@ -2,9 +2,9 @@
 protocol Unmoveds {
 
   record UnmovedGeo {
-    string id;
-    float lat;
-    float lon;
-    string geohash;
+    string ID;
+    double LAT;
+    double LON;
+    string GEOHASH;
   }
 }

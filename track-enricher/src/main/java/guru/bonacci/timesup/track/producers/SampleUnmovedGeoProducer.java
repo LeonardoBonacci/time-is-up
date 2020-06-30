@@ -44,7 +44,7 @@ public class SampleUnmovedGeoProducer {
 	// Produce sample data
 	void send() {
 		String key = "Torpedo7Albany";
-		UnmovedGeo record = UnmovedGeo.newBuilder().setId(key).setLat(1.0f).setLon(2.0f).setGeohash("s00twy01").build();
+		UnmovedGeo record = UnmovedGeo.newBuilder().setID(key).setLAT(1.0f).setLON(2.0f).setGEOHASH("s00twy01").build();
 //		record = null; //tombstone
 		
 		System.out.printf("Producing record: %s\t%s", key, record);

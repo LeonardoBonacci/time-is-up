@@ -1,3 +1,24 @@
+CREATE STREAM track
+  (tracking_number VARCHAR,
+     mover_id VARCHAR,
+     unmoved_id VARCHAR)
+  WITH (KAFKA_TOPIC = 'track',
+        KEY = 'tracking_number',
+        VALUE_FORMAT = 'avro',
+        PARTITIONS = 1);
+
+CREATE STREAM test
+(trackid VARCHAR,
+ name VARCHAR)
+WITH (KAFKA_TOPIC = 'test',
+  VALUE_FORMAT = 'avro',
+    KEY = 'trackid',
+      PARTITIONS = 1);
+
+INSERT INTO test (rowkey, trackid, name) VALUES ('foo', 'foo', 'bar1');
+INSERT INTO test (rowkey, trackid, name) VALUES ('foo', 'foo', 'bar2');
+
+
 -- query tracks per day per unmoved
 
 
