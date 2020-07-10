@@ -34,13 +34,11 @@ WITH (KAFKA_TOPIC = 'track_geo',
      KEY = 'mover_id');
 
 CREATE STREAM mover
-  (id VARCHAR,
+  (id VARCHAR KEY,
    lat DOUBLE,
    lon DOUBLE)
   WITH (KAFKA_TOPIC='mover',
-        VALUE_FORMAT='avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Mover',
-        KEY = 'id',
+        VALUE_FORMAT='json',
         PARTITIONS = 1);
 
 INSERT INTO mover (id, lat, lon) VALUES ('moverid', 0.90, 0.90);

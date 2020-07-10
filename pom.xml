@@ -1,20 +1,43 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>guru.bonacci.timesup</groupId>
-  <artifactId>parent</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>guru.bonacci.timesup</groupId>
+	<artifactId>parent</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-  <modules>
-    <module>track-enricher</module>
-  </modules>
-  
-  <repositories>
+	<modules>
+		<module>track-enricher</module>
+	</modules>
+
+	<repositories>
 		<repository>
 			<id>confluent</id>
 			<url>http://packages.confluent.io/maven/</url>
 		</repository>
+		<repository>
+			<id>ksqlDB</id>
+			<name>ksqlDB</name>
+			<url>https://ksqldb-maven.s3.amazonaws.com/maven/</url>
+		</repository>
+		<repository>
+			<id>confluent</id>
+			<name>Confluent</name>
+			<url>https://jenkins-confluent-packages-beta-maven.s3.amazonaws.com/6.0.0-beta200608020919/1/maven/</url>
+		</repository>
 	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>ksqlDB</id>
+			<url>https://ksqldb-maven.s3.amazonaws.com/maven/</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>confluent</id>
+			<url>https://jenkins-confluent-packages-beta-maven.s3.amazonaws.com/6.0.0-beta200608020919/1/maven/</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
