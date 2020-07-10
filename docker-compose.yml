@@ -105,5 +105,6 @@ services:
     image: leonardobonacci/tracker
     depends_on:
       - broker
+      - ksqldb-server
     ports:
       - "8080:8080"

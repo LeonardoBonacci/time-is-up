@@ -8,6 +8,7 @@
 	<artifactId>track-app</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<properties>
+		<ksqldb.version>0.10.0</ksqldb.version>
 		<compiler-plugin.version>3.8.1</compiler-plugin.version>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<maven.compiler.source>11</maven.compiler.source>
@@ -20,10 +21,20 @@
 		<quarkus.platform.version>1.5.2.Final</quarkus.platform.version>
 		<surefire-plugin.version>2.22.1</surefire-plugin.version>
 	</properties>
-		<repositories>
+	<repositories>
 		<repository>
 			<id>confluent</id>
 			<url>http://packages.confluent.io/maven/</url>
+		</repository>
+		<repository>
+			<id>ksqlDB</id>
+			<name>ksqlDB</name>
+			<url>https://ksqldb-maven.s3.amazonaws.com/maven/</url>
+		</repository>
+		<repository>
+			<id>confluent2</id>
+			<name>Confluent</name>
+			<url>https://jenkins-confluent-packages-beta-maven.s3.amazonaws.com/6.0.0-beta200608020919/1/maven/</url>
 		</repository>
 	</repositories>
 	<dependencyManagement>
@@ -38,6 +49,12 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
+      <dependency>
+            <groupId>io.confluent.ksql</groupId>
+            <artifactId>ksqldb-api-client</artifactId>
+            <version>${ksqldb.version}</version>
+        </dependency>
+	
 	<dependency>
 	    <groupId>io.confluent</groupId>
 	    <artifactId>kafka-json-serializer</artifactId>
