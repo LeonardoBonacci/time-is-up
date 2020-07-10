@@ -100,3 +100,10 @@ services:
     image: tile38/tile38:edge
     ports:
       - "9851:9851"
+
+  tracker:
+    image: leonardobonacci/tracker
+    depends_on:
+      - broker
+    ports:
+      - "8080:8080"
