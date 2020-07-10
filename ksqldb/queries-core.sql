@@ -1,17 +1,14 @@
 CREATE STREAM unmoved
- (id VARCHAR,
+ (id VARCHAR KEY,
   lat DOUBLE,
   lon DOUBLE)
  WITH (KAFKA_TOPIC = 'unmoved',
-       VALUE_FORMAT = 'avro',
-       VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Unmoved',
-       KEY = 'id',
+       VALUE_FORMAT = 'json',
        PARTITIONS = 1);
 
 CREATE STREAM unmoved_geo
   WITH (KAFKA_TOPIC = 'unmoved_geo',
-        VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.UnmovedGeo',
+        VALUE_FORMAT = 'json',
         PARTITIONS = 1)
   AS SELECT id, lat, lon, GEOHASH(lat, lon, 8) AS geohash
   FROM unmoved;
@@ -23,15 +20,13 @@ INSERT INTO unmoved (id, lat, lon) VALUES ('TEST', 10.0, -10.0);
 
 CREATE STREAM track_geo
   (tracking_number VARCHAR,
-   mover_id VARCHAR,
+   mover_id VARCHAR KEY,
    unmoved_id VARCHAR,
    unmoved_geohash VARCHAR,
    unmoved_lat DOUBLE,
    unmoved_lon DOUBLE)
 WITH (KAFKA_TOPIC = 'track_geo',
-     VALUE_FORMAT = 'avro',
-     VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.TrackGeo',
-     KEY = 'mover_id');
+     VALUE_FORMAT = 'json');
 
 CREATE STREAM mover
   (id VARCHAR KEY,
@@ -54,8 +49,7 @@ INSERT INTO mover (id, lat, lon) VALUES ('moverid', 0.90, 0.90);
 -- after the track has been registred
 CREATE STREAM trace_unfiltered
   WITH (KAFKA_TOPIC = 'trace_unfiltered',
-        VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Trace'
+        VALUE_FORMAT = 'json',
         PARTITIONS = 1)
   AS SELECT
           mover.id AS mover_id,
@@ -80,21 +74,17 @@ CREATE STREAM trace_unfiltered
 -- movers on deleted/unregistred tracks are filtered from tracing
 -- table with 'tracks in progress'
 CREATE TABLE track_t
-    (rowkey VARCHAR KEY,
-     tracking_number VARCHAR,
+    (tracking_number VARCHAR PRIMARY KEY,
      mover_id VARCHAR,
      unmoved_id VARCHAR)
   WITH (KAFKA_TOPIC = 'track',
-       VALUE_FORMAT = 'avro',
-       VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Track'
-       KEY = 'tracking_number',
+       VALUE_FORMAT = 'json',
        PARTITIONS = 1);
 
 -- include 'trace in progress' and exclude 'trace no longer in progress'
 CREATE STREAM trace
   WITH (KAFKA_TOPIC = 'trace',
-        VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Trace',
+        VALUE_FORMAT = 'json',
         PARTITIONS = 1)
   AS SELECT
           trace.mover_id AS mover_id,
@@ -148,8 +138,7 @@ CREATE STREAM arrival_raw (id STRING, nearby STRUCT<id STRING>)
 -- 'nearby is not null' filters out the faraway messages
 CREATE STREAM arrival
   WITH (KAFKA_TOPIC = 'arrival',
-        VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Arrival',
+        VALUE_FORMAT = 'json',
         PARTITIONS = 1)
   AS SELECT id as mover_id,
           nearby->id as unmoved_id
@@ -160,8 +149,7 @@ CREATE STREAM arrival
 -- this stream can be used for multiple estimation algorithms
 CREATE STREAM pickup
   WITH (KAFKA_TOPIC = 'pickup',
-        VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Pickup',
+        VALUE_FORMAT = 'json',
         PARTITIONS = 1)
     AS SELECT
       trace.mover_id AS mover_id,
@@ -179,9 +167,8 @@ CREATE STREAM pickup
     WHERE arrival.unmoved_id = trace.unmoved_id;
 
 CREATE STREAM geohash_estimate
-  WITH (VALUE_FORMAT = 'avro',
-      KAFKA_TOPIC = 'geohash_estimate',
-      VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.GeohashEstimate',
+  WITH (KAFKA_TOPIC = 'geohash_estimate',
+      VALUE_FORMAT = 'json',
       PARTITIONS = 1)
   AS SELECT
     pickup.togo_ms as togo_ms,
@@ -191,36 +178,31 @@ CREATE STREAM geohash_estimate
 
 CREATE TABLE geohash_avg_estimate_t
   WITH (KAFKA_TOPIC = 'geohash_avg_estimate',
-        VALUE_FORMAT = 'avro',
-        VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.GeohashAvgEstimate',
+        VALUE_FORMAT = 'json',
         PARTITIONS = 1)
     AS SELECT hashkey,
       AVG(togo_ms) as togo_ms
-      FROM pickup_time
+      FROM geohash_estimate
       GROUP BY hashkey
       EMIT CHANGES;
 
 CREATE STREAM trace_to_geohash_avg_estimate
-  WITH (VALUE_FORMAT = 'avro',
-      VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Something'
-      KAFKA_TOPIC = 'trace_to_geohash_avg_estimate',
+  WITH (KAFKA_TOPIC = 'trace_to_geohash_avg_estimate',
+      VALUE_FORMAT = 'json',
       PARTITIONS = 1)
   AS SELECT *,
-    mover_geohash + '/' + unmoved_geohash as hashkey
+    AS_VALUE(mover_geohash + '/' + unmoved_geohash) AS hashkey
   FROM trace
   PARTITION BY (mover_geohash + '/' + unmoved_geohash);
 
 CREATE STREAM homeward
-    WITH (VALUE_FORMAT = 'avro',
-          VALUE_AVRO_SCHEMA_FULL_NAME='guru.bonacci.timesup.model.Homeward'
-          KAFKA_TOPIC = 'homeward',
+    WITH (KAFKA_TOPIC = 'homeward',
+          VALUE_FORMAT = 'json',
           PARTITIONS = 1)
     AS SELECT
      trace.unmoved_id as unmoved_id,
-     trace.lat as lat,
-     trace.lon as lon,
      trace.tracking_number AS tracking_number,
      estimate.togo_ms as togo_ms
-    FROM trace_to_estimate AS trace
-    INNER JOIN estimate_t as estimate ON estimate.hashkey = trace.hashkey
+    FROM trace_to_geohash_avg_estimate AS trace
+    INNER JOIN geohash_avg_estimate_t as estimate ON estimate.hashkey = trace.hashkey
     PARTITION BY trace.tracking_number;
