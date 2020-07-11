@@ -101,10 +101,11 @@ services:
     ports:
       - "9851:9851"
 
-  tracker:
-    image: leonardobonacci/tracker
-    depends_on:
-      - broker
-      - ksqldb-server
-    ports:
-      - "8080:8080"
+  # tracker:
+  #   image: leonardobonacci/tracker
+  #   container_name: tracker
+  #   depends_on:
+  #     - broker
+  #     - ksqldb-server
+  #   ports:
+  #     - "8080:8080"
