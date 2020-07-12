@@ -206,3 +206,16 @@ CREATE STREAM homeward
     FROM trace_to_geohash_avg_estimate AS trace
     INNER JOIN geohash_avg_estimate_t as estimate ON estimate.hashkey = trace.hashkey
     PARTITION BY trace.tracking_number;
+
+CREATE STREAM homeward
+ (tracking_number STRING KEY,
+  unmoved_id STRING,
+  togo_ms INT)
+ WITH (KAFKA_TOPIC = 'homeward',
+       VALUE_FORMAT = 'json',
+       PARTITIONS = 1);
+
+INSERT INTO homeward (unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'order1', 10);
+INSERT INTO homeward (unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'order2', 15);
+INSERT INTO homeward (unmoved_id, tracking_number, togo_ms) VALUES ('foo', 'bar', 100);
+INSERT INTO homeward (unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'order1', 5);

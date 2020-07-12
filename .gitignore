@@ -173,3 +173,5 @@ datagen/kafka-streams/_confluent-ksql-default_query_CSAS_TRACE_UNFILTERED_5/0_0/
 datagen/kafka-streams/_confluent-ksql-default_query_CSAS_TRACE_UNFILTERED_5/0_0/KSTREAM-JOINTHIS-0000000008-store/KSTREAM-JOINTHIS-0000000008-store.1593518400000/MANIFEST-000009
 datagen/kafka-streams/_confluent-ksql-default_query_CSAS_TRACE_UNFILTERED_5/0_0/KSTREAM-JOINTHIS-0000000008-store/KSTREAM-JOINTHIS-0000000008-store.1593518400000/OPTIONS-000005
 datagen/kafka-streams/_confluent-ksql-default_query_CSAS_TRACE_UNFILTERED_5/0_0/KSTREAM-JOINTHIS-0000000008-store/KSTREAM-JOINTHIS-0000000008-store.1593518400000/OPTIONS-000012
+datagen/
+home/.mvn/
