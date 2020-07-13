@@ -75,6 +75,11 @@
 			<version>${ksqldb.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>guru.bonacci.kafka</groupId>
+			<artifactId>client-serialization</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-kafka-client</artifactId>
 		</dependency>

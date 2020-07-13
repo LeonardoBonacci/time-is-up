@@ -10,16 +10,15 @@ import javax.inject.Inject;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.KeyQueryMetadata;
+import org.apache.kafka.streams.StoreQueryParameters;
 import org.apache.kafka.streams.errors.InvalidStateStoreException;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyWindowStore;
-import org.apache.kafka.streams.state.StreamsMetadata;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import com.google.common.collect.Streams;
 
-import guru.bonacci.timesup.home.consume.SinkTopologyProducer;
 import guru.bonacci.timesup.home.model.UnmovedAggr;
 import guru.bonacci.timesup.home.rest.UnmovedDataResult;
 import lombok.extern.slf4j.Slf4j;
@@ -29,15 +28,15 @@ import lombok.extern.slf4j.Slf4j;
 public class InteractiveQueries {
 
 
-	@ConfigProperty(name="hostname")
-    String host;
+//TODO	@ConfigProperty(name = "hostname")
+    String host = "localhost";
 
     @Inject
     KafkaStreams streams;
 
     
     public List<PipelineMetadata> getMetaData() {
-        return streams.allMetadataForStore(SinkTopologyProducer.STORE)
+        return streams.allMetadataForStore(TopologyProducer.STORE)
                 .stream()
                 .map(m -> new PipelineMetadata(
                         m.hostInfo().host() + ":" + m.hostInfo().port(),
@@ -50,23 +49,22 @@ public class InteractiveQueries {
     }
 
     public UnmovedDataResult getData(String unmovedId) {
-        StreamsMetadata metadata = streams.metadataForKey(
-                SinkTopologyProducer.STORE,
+        KeyQueryMetadata metadata = streams.queryMetadataForKey(
+                TopologyProducer.STORE,
                 unmovedId,
                 Serdes.String().serializer()
         );
 
-        if (metadata == null || metadata == StreamsMetadata.NOT_AVAILABLE) {
+        if (metadata == null || metadata == KeyQueryMetadata.NOT_AVAILABLE) {
             log.warn("Found no metadata for key {}", unmovedId);
             return UnmovedDataResult.notFound();
         }
-        else if (metadata.host().equals(host)) {
+        else if (metadata.getActiveHost().host().equals(host)) {
             log.info("Found data for key {} locally", unmovedId);
             
             // for demo purposes we query the last three seconds (of several windows)
-            // this way trains don't cling to stations when they have passed
-            KeyValueIterator<Long, UnmovedAggr> result1 = getStore().fetch(unmovedId, Instant.now().minusSeconds(2), Instant.now());
-            UnmovedAggr result = Streams.stream(result1).map(keyValue -> keyValue.value).reduce(new UnmovedAggr(), UnmovedAggr::merge);
+            KeyValueIterator<Long, UnmovedAggr> windows = getStore().fetch(unmovedId, Instant.now().minusSeconds(10), Instant.now());
+            UnmovedAggr result = Streams.stream(windows).map(keyValue -> keyValue.value).reduce(new UnmovedAggr(), UnmovedAggr::merge);
 
             if (result != null) {
                 return UnmovedDataResult.found(UnmovedData.from(result));
@@ -76,15 +74,16 @@ public class InteractiveQueries {
             }
         }
         else {
-            log.info("Found data for key {} on remote host {}:{}", unmovedId, metadata.host(), metadata.port());
-            return UnmovedDataResult.foundRemotely(metadata.host(), metadata.port());
+//            log.info("Found data for key {} on remote host {}:{}", unmovedId, metadata.host(), metadata.port());
+//            return UnmovedDataResult.foundRemotely(metadata.host(), metadata.port());
+        	return null; //TODO
         }
     }
 
     private ReadOnlyWindowStore<String, UnmovedAggr> getStore() {
         while (true) {
             try {
-                return streams.store(SinkTopologyProducer.STORE, QueryableStoreTypes.windowStore());
+                return streams.store(StoreQueryParameters.fromNameAndType(TopologyProducer.STORE, QueryableStoreTypes.windowStore()));
             } catch (InvalidStateStoreException e) {
                 // ignore, store not ready yet
             }

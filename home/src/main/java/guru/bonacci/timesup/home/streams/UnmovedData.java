@@ -24,7 +24,7 @@ public class UnmovedData {
         return new UnmovedData(
                 aggregation.unmovedId,
                 aggregation.traces.values().stream()
-                				.map(TraceData::from)
-                				.collect(Collectors.toList()));
+            				.map(TraceData::from)
+            				.collect(Collectors.toList()));
     }
 }

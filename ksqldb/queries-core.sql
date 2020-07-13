@@ -208,14 +208,15 @@ CREATE STREAM homeward
     PARTITION BY trace.tracking_number;
 
 CREATE STREAM homeward
- (tracking_number STRING KEY,
+ (temp STRING KEY,
   unmoved_id STRING,
+  tracking_number STRING,
   togo_ms INT)
  WITH (KAFKA_TOPIC = 'homeward',
        VALUE_FORMAT = 'json',
        PARTITIONS = 1);
 
-INSERT INTO homeward (unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'order1', 10);
-INSERT INTO homeward (unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'order2', 15);
-INSERT INTO homeward (unmoved_id, tracking_number, togo_ms) VALUES ('foo', 'bar', 100);
-INSERT INTO homeward (unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'order1', 5);
+INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order1', 'Torpedo7Albany', 'order1', 10);
+INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order2', 'Torpedo7Albany', 'order2', 15);
+INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('bar', 'foo', 'bar', 100);
+INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order1', 'Torpedo7Albany', 'order1', 5);
