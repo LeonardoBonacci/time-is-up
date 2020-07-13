@@ -220,3 +220,4 @@ INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order
 INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order2', 'Torpedo7Albany', 'order2', 15);
 INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('bar', 'foo', 'bar', 100);
 INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order1', 'Torpedo7Albany', 'order1', 5);
+INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order2', 'Torpedo7Albany', 'order2', 2);

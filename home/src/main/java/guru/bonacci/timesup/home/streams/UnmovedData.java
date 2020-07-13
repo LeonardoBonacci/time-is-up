@@ -1,5 +1,6 @@
 package guru.bonacci.timesup.home.streams;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ public class UnmovedData {
                 aggregation.unmovedId,
                 aggregation.traces.values().stream()
             				.map(TraceData::from)
+            				.sorted(Comparator.comparingLong(TraceData::getMsUntilArrival))
             				.collect(Collectors.toList()));
     }
 }
