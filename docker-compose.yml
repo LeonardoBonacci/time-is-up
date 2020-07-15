@@ -83,7 +83,6 @@ services:
     volumes:
       - ./confluent-hub-components:/usr/share/kafka/plugins
       - ./ksqldb:/usr/ext #mounts a custom UDF jar for ksql
-      - ./datagen:/tmp
 
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.10.1

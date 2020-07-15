@@ -169,25 +169,15 @@ CREATE STREAM pickup
     INNER JOIN arrival as arrival WITHIN (0 MILLISECONDS, 1 HOUR) ON arrival.mover_id = trace.mover_id
     WHERE arrival.unmoved_id = trace.unmoved_id;
 
-CREATE STREAM geohash_estimate
-  WITH (KAFKA_TOPIC = 'geohash_estimate',
-      VALUE_FORMAT = 'json',
-      PARTITIONS = 1)
-  AS SELECT
-    pickup.togo_ms as togo_ms,
-    mover_geohash + '/' + unmoved_geohash as hashkey
-  FROM pickup
-  PARTITION BY (mover_geohash + '/' + unmoved_geohash);
-
--- TODO can this be done directly from pickup?
 CREATE TABLE geohash_avg_estimate_t
   WITH (KAFKA_TOPIC = 'geohash_avg_estimate',
         VALUE_FORMAT = 'json',
         PARTITIONS = 1)
-    AS SELECT hashkey,
-      AVG(togo_ms) as togo_ms
-      FROM geohash_estimate
-      GROUP BY hashkey
+    AS SELECT
+      AVG(togo_ms) as togo_ms,
+      (mover_geohash + '/' + unmoved_geohash) as hashkey
+      FROM pickup
+      GROUP BY (mover_geohash + '/' + unmoved_geohash)
       EMIT CHANGES;
 
 -- TODO behavior first time -> without avg'es?
