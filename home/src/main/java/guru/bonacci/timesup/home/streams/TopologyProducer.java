@@ -35,12 +35,12 @@ public class TopologyProducer {
         Serde<Trace> traceSerde = JacksonSerde.of(Trace.class);
         Serde<UnmovedAggr> aggrSerde = JacksonSerde.of(UnmovedAggr.class, true);
         
-        // for demo purposes we retain five windows of five seconds 
+        // for demo purposes we retain data for 60 seconds..
         WindowBytesStoreSupplier storeSupplier = 
-        		Stores.persistentWindowStore(	STORE, 
-								        		Duration.ofSeconds(5), 
-								        		Duration.ofSeconds(5), 
-								        		false);
+        		Stores.persistentWindowStore(STORE, 
+								        	 Duration.ofSeconds(60), 
+								        	 Duration.ofSeconds(60), 
+								        	 false);
 
         builder.stream(
                 HOMEWARD_TOPIC,
@@ -49,7 +49,7 @@ public class TopologyProducer {
         	.peek((k,v) -> System.out.println(k + "<before>" + v))
         	.selectKey((key, value) -> value.UNMOVED_ID) 
         	.groupByKey(Grouped.with(Serdes.String(), traceSerde))
-        	.windowedBy(TimeWindows.of(Duration.ofSeconds(5)))
+        	.windowedBy(TimeWindows.of(Duration.ofSeconds(15))) //.. in 15 second windows 
             .aggregate( 
                     UnmovedAggr::new,
                     (unmovedId, trace, aggr) -> aggr.updateFrom(trace),

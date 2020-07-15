@@ -1,32 +1,70 @@
 CREATE STREAM unmoved
- (id VARCHAR KEY,
+ (rowkey VARCHAR KEY,
+  id VARCHAR, --id in payload is used by connector
   lat DOUBLE,
-  lon DOUBLE)
+  lon DOUBLE
+ )
  WITH (KAFKA_TOPIC = 'unmoved',
        VALUE_FORMAT = 'json',
        PARTITIONS = 1);
 
-CREATE STREAM unmoved_geo
-  WITH (KAFKA_TOPIC = 'unmoved_geo',
-        VALUE_FORMAT = 'json',
-        PARTITIONS = 1)
-  AS SELECT id, lat, lon, GEOHASH(lat, lon, 8) AS geohash
-  FROM unmoved;
+CREATE SINK CONNECTOR tile WITH (
+   'tasks.max' = '1',
+   'connector.class' = 'guru.bonacci.kafka.connect.tile38.Tile38SinkConnector',
+   'topics' = 'unmoved,trace',
+   'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
+   'value.converter' = 'org.apache.kafka.connect.json.JsonConverter',
+   'value.converter.schemas.enable' = false,
+   'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LAT event.LON',
+   'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.MOVER_LAT event.MOVER_LON',
+   'tile38.host' = 'tile38',
+   'tile38.port' = 9851);
 
-INSERT INTO unmoved (id, lat, lon) VALUES ('Torpedo7Albany', 1.0, 1.0);
-INSERT INTO unmoved (id, lat, lon) VALUES ('TEST', 10.0, -10.0);
+-- topic arrival_raw: message.timestamp.type.LogAppendTime
+-- docker run --net=host -it tile38/tile38 tile38-cli
+-- SETHOOK arrivals kafka://broker:29092/arrival_raw NEARBY trace FENCE NODWELL ROAM unmoved * 100
 
--- 'CREATE TABLE unmoved_geo_t' has become part of the track-enricher kstream-app
+CREATE TABLE unmoved_t
+    (id VARCHAR PRIMARY KEY,
+     lat DOUBLE,
+     lon DOUBLE)
+  WITH (KAFKA_TOPIC = 'unmoved',
+       VALUE_FORMAT = 'json',
+       PARTITIONS = 1);
+
+CREATE STREAM track
+ (tracking_number VARCHAR KEY,
+  mover_id VARCHAR,
+  unmoved_id VARCHAR
+  )
+ WITH (KAFKA_TOPIC = 'track',
+       VALUE_FORMAT = 'json',
+       PARTITIONS = 1);
 
 CREATE STREAM track_geo
-  (tracking_number VARCHAR,
-   mover_id VARCHAR KEY,
-   unmoved_id VARCHAR,
-   unmoved_geohash VARCHAR,
-   unmoved_lat DOUBLE,
-   unmoved_lon DOUBLE)
-WITH (KAFKA_TOPIC = 'track_geo',
-     VALUE_FORMAT = 'json');
+  WITH (KAFKA_TOPIC = 'track_geo',
+        VALUE_FORMAT = 'json',
+        PARTITIONS = 1)
+  AS SELECT
+    track.mover_id,
+    track.tracking_number,
+    track.unmoved_id,
+    GEOHASH(lat, lon, 8) AS unmoved_geohash,
+    lat AS unmoved_lat,
+    lon AS unmoved_lon
+  FROM track
+  INNER JOIN unmoved_t AS unmoved ON track.unmoved_id = unmoved.id
+  PARTITION BY track.mover_id;
+
+  -- table with 'tracks in progress'
+  -- movers on deleted/unregistred tracks are filtered from tracing
+CREATE TABLE track_t
+  (tracking_number VARCHAR PRIMARY KEY,
+   mover_id VARCHAR,
+   unmoved_id VARCHAR)
+WITH (KAFKA_TOPIC = 'track',
+     VALUE_FORMAT = 'json',
+     PARTITIONS = 1);
 
 CREATE STREAM mover
   (id VARCHAR KEY,
@@ -35,8 +73,6 @@ CREATE STREAM mover
   WITH (KAFKA_TOPIC='mover',
         VALUE_FORMAT='json',
         PARTITIONS = 1);
-
-INSERT INTO mover (id, lat, lon) VALUES ('moverid', 0.90, 0.90);
 
 -- GEOHASH MEANING
 --4 -> 39.1km x 19.5km
@@ -68,18 +104,17 @@ CREATE STREAM trace_unfiltered
           track.unmoved_lon AS unmoved_lon,
           track.unmoved_geohash AS unmoved_geohash
   FROM mover
-  INNER JOIN track_geo AS track WITHIN (1 DAY, 0 SECONDS) ON mover.id = track.mover_id
-  PARTITION BY track.tracking_number;
+  INNER JOIN track_geo AS track WITHIN (1 DAY, 0 SECONDS) ON mover.id = track.mover_id;
 
--- movers on deleted/unregistred tracks are filtered from tracing
--- table with 'tracks in progress'
-CREATE TABLE track_t
-    (tracking_number VARCHAR PRIMARY KEY,
-     mover_id VARCHAR,
-     unmoved_id VARCHAR)
-  WITH (KAFKA_TOPIC = 'track',
-       VALUE_FORMAT = 'json',
-       PARTITIONS = 1);
+
+-- sample data
+INSERT INTO unmoved (id, lat, lon) VALUES ('Torpedo7Albany', 1.0, 1.0);
+INSERT INTO unmoved (id, lat, lon) VALUES ('TEST', 10.0, -10.0);
+INSERT INTO track (tracking_number, mover_id, unmoved_id) VALUES ('somenumber', 'thisisme', 'Torpedo7Albany');
+INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.90, 0.90);
+INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.71, 0.96);
+INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 1.0, 1.0);
+
 
 -- include 'trace in progress' and exclude 'trace no longer in progress'
 CREATE STREAM trace
@@ -97,39 +132,7 @@ CREATE STREAM trace
           trace.unmoved_lon AS unmoved_lon,
           trace.unmoved_geohash AS unmoved_geohash
   FROM trace_unfiltered AS trace
-  INNER JOIN track_t AS track ON trace.tracking_number = track.tracking_number
-  PARTITION BY trace.mover_id;
-
-/**
-./kafka-avro-console-consumer \
-    --bootstrap-server localhost:9092 \
-    --property schema.registry.url=http://localhost:8081 \
-    --topic trace \
-    --from-beginning
-*/
-
-INSERT INTO mover (id, lat, lon) VALUES ('moverid', 0.71, 0.96);
-INSERT INTO mover (id, lat, lon) VALUES ('moverid', 1.0, 1.0);
-
-CREATE SINK CONNECTOR tile WITH (
-    'tasks.max' = '1',
-    'connector.class' = 'guru.bonacci.kafka.connect.tile38.Tile38SinkConnector',
-    'topics' = 'unmoved,trace',
-    'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
-    'value.converter' = 'io.confluent.connect.avro.AvroConverter',
-    'value.converter.schema.registry.url' = 'http://schema-registry:8081',
-    'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LAT event.LON',
-    'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.MOVER_LAT event.MOVER_LON',
-    'tile38.host' = 'tile38',
-    'tile38.port' = 9851,
-    'errors.tolerance' = 'all',
-    'errors.log.enable' = true,
-    'errors.log.include.messages' = true);
-
--- topic arrival_raw: message.timestamp.type.LogAppendTime
--- docker run --net=host -it tile38/tile38 tile38-cli
--- SETHOOK arrivals kafka://broker:29092/arrival_raw NEARBY trace FENCE NODWELL ROAM unmoved * 100
-
+  INNER JOIN track_t AS track ON trace.tracking_number = track.tracking_number;
 
 CREATE STREAM arrival_raw (id STRING, nearby STRUCT<id STRING>)
   WITH (KAFKA_TOPIC = 'arrival_raw',
@@ -176,6 +179,7 @@ CREATE STREAM geohash_estimate
   FROM pickup
   PARTITION BY (mover_geohash + '/' + unmoved_geohash);
 
+-- TODO can this be done directly from pickup?
 CREATE TABLE geohash_avg_estimate_t
   WITH (KAFKA_TOPIC = 'geohash_avg_estimate',
         VALUE_FORMAT = 'json',
@@ -186,15 +190,7 @@ CREATE TABLE geohash_avg_estimate_t
       GROUP BY hashkey
       EMIT CHANGES;
 
-CREATE STREAM trace_to_geohash_avg_estimate
-  WITH (KAFKA_TOPIC = 'trace_to_geohash_avg_estimate',
-      VALUE_FORMAT = 'json',
-      PARTITIONS = 1)
-  AS SELECT *,
-    AS_VALUE(mover_geohash + '/' + unmoved_geohash) AS hashkey
-  FROM trace
-  PARTITION BY (mover_geohash + '/' + unmoved_geohash);
-
+-- TODO behavior first time -> without avg'es?
 CREATE STREAM homeward
     WITH (KAFKA_TOPIC = 'homeward',
           VALUE_FORMAT = 'json',
@@ -203,21 +199,13 @@ CREATE STREAM homeward
      trace.unmoved_id as unmoved_id,
      trace.tracking_number AS tracking_number,
      estimate.togo_ms as togo_ms
-    FROM trace_to_geohash_avg_estimate AS trace
-    INNER JOIN geohash_avg_estimate_t as estimate ON estimate.hashkey = trace.hashkey
-    PARTITION BY trace.tracking_number;
+    FROM trace
+    INNER JOIN geohash_avg_estimate_t as estimate ON trace.mover_geohash + '/' + trace.unmoved_geohash = estimate.hashkey
+    PARTITION BY trace.unmoved_id;
 
-CREATE STREAM homeward
- (temp STRING KEY,
-  unmoved_id STRING,
-  tracking_number STRING,
-  togo_ms INT)
- WITH (KAFKA_TOPIC = 'homeward',
-       VALUE_FORMAT = 'json',
-       PARTITIONS = 1);
 
-INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order1', 'Torpedo7Albany', 'order1', 10);
-INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order2', 'Torpedo7Albany', 'order2', 15);
-INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('bar', 'foo', 'bar', 100);
-INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order1', 'Torpedo7Albany', 'order1', 5);
-INSERT INTO homeward (temp, unmoved_id, tracking_number, togo_ms) VALUES ('order2', 'Torpedo7Albany', 'order2', 2);
+INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 'order1', 10);
+INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 'order2', 15);
+INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('foo', 'foo', 'bar', 100);
+INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 'order1', 5);
+INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 'order2', 2);
