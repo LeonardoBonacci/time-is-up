@@ -40,7 +40,9 @@ public class UnmovedProducer {
 	}
 
 	public void send(Unmoved record) {
-		send(record.id, record);
+		if (record != null)
+			send(record.id, record);
+		else log.warn("Suspicious incoming request");
 	}
 	
 	public void tombstone(final String key) {

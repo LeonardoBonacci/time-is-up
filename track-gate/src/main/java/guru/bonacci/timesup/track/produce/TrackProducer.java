@@ -46,7 +46,8 @@ public class TrackProducer {
 
 	public void send(Track record) {
 		if (record != null)
-			send(record.tracking_number, record);
+			send (record.tracking_number, record);
+		else log.warn("Suspicious incoming request");
 	}
 	
 	public void tombstone(final String key, final long delay) {

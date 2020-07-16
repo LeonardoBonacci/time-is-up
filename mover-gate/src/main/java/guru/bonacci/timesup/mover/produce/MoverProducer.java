@@ -28,6 +28,9 @@ public class MoverProducer {
 	}
 
 	public CompletableFuture<Void> send(final Mover mover) {
+		if (mover == null)
+			log.warn("Suspicious incoming request");
+
 		log.infof("Producing record: %s", mover);
 		KsqlObject row = new KsqlObject().put("ID", mover.id).put("LAT", Double.valueOf(mover.lat)).put("LON", Double.valueOf(mover.lon));
 		return client.insertInto("MOVER", row);

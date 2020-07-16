@@ -6,80 +6,21 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>guru.bonacci.timesup.unmoved</groupId>
 	<artifactId>unmoved-gate</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-	<properties>
-		<ksqldb.version>0.10.0</ksqldb.version>
-		<compiler-plugin.version>3.8.1</compiler-plugin.version>
-		<maven.compiler.parameters>true</maven.compiler.parameters>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<quarkus-plugin.version>1.5.2.Final</quarkus-plugin.version>
-		<quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
-		<quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-		<quarkus.platform.version>1.5.2.Final</quarkus.platform.version>
-		<surefire-plugin.version>2.22.1</surefire-plugin.version>
-	</properties>
-	<repositories>
-		<repository>
-			<id>confluent</id>
-			<url>http://packages.confluent.io/maven/</url>
-		</repository>
-		<repository>
-			<id>ksqlDB</id>
-			<name>ksqlDB</name>
-			<url>https://ksqldb-maven.s3.amazonaws.com/maven/</url>
-		</repository>
-		<repository>
-			<id>confluent2</id>
-			<name>Confluent</name>
-			<url>https://jenkins-confluent-packages-beta-maven.s3.amazonaws.com/6.0.0-beta200608020919/1/maven/</url>
-		</repository>
-	</repositories>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>${quarkus.platform.group-id}</groupId>
-				<artifactId>${quarkus.platform.artifact-id}</artifactId>
-				<version>${quarkus.platform.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	<parent>
+		<groupId>guru.bonacci.timesup</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
+	</parent>
+	
 	<dependencies>
-		<dependency>
-			<groupId>io.confluent.ksql</groupId>
-			<artifactId>ksqldb-api-client</artifactId>
-			<version>${ksqldb.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>io.confluent</groupId>
 			<artifactId>kafka-json-serializer</artifactId>
-			<version>5.5.0</version>
 		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.12</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-resteasy</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.quarkus</groupId>
-			<artifactId>quarkus-junit5</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.rest-assured</groupId>
-			<artifactId>rest-assured</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>
@@ -90,70 +31,4 @@
 			<artifactId>quarkus-kafka-client</artifactId>
 		</dependency>
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>io.quarkus</groupId>
-				<artifactId>quarkus-maven-plugin</artifactId>
-				<version>${quarkus-plugin.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>build</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${compiler-plugin.version}</version>
-			</plugin>
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${surefire-plugin.version}</version>
-				<configuration>
-					<systemPropertyVariables>
-						<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-						<maven.home>${maven.home}</maven.home>
-					</systemPropertyVariables>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	<profiles>
-		<profile>
-			<id>native</id>
-			<activation>
-				<property>
-					<name>native</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>${surefire-plugin.version}</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>integration-test</goal>
-									<goal>verify</goal>
-								</goals>
-								<configuration>
-									<systemPropertyVariables>
-										<native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
-										<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-										<maven.home>${maven.home}</maven.home>
-									</systemPropertyVariables>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-			<properties>
-				<quarkus.package.type>native</quarkus.package.type>
-			</properties>
-		</profile>
-	</profiles>
 </project>
