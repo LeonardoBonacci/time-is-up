@@ -4,6 +4,7 @@ CREATE STREAM unmoved
   lat DOUBLE,
   lon DOUBLE
  )
+
  WITH (KAFKA_TOPIC = 'unmoved',
        VALUE_FORMAT = 'json',
        PARTITIONS = 1);

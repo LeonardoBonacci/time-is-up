@@ -1,9 +1,8 @@
-package guru.bonacci.timesup.track.produce;
+package guru.bonacci.timesup.unmoved.produce;
 
 import java.util.Properties;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -14,23 +13,19 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.jboss.logging.Logger;
 
-import guru.bonacci.timesup.track.model.Track;
+import guru.bonacci.timesup.unmoved.model.Unmoved;
 import io.confluent.kafka.serializers.KafkaJsonSerializer;
-import io.vertx.core.Vertx;
 
 @ApplicationScoped
-public class TrackProducer {
+public class UnmovedProducer {
 
-	private final Logger log = Logger.getLogger(TrackProducer.class);
+	private final Logger log = Logger.getLogger(UnmovedProducer.class);
 	
-	static final String TOPIC = "track";
+	static final String TOPIC = "unmoved";
+	
+	Producer<String, Unmoved> producer;
 
-	@Inject Vertx vertx;
-	
-	
-	Producer<String, Track> producer;
-
-	public TrackProducer() {
+	public UnmovedProducer() {
 		producer = new KafkaProducer<>(configure());
 	}
 
@@ -40,28 +35,22 @@ public class TrackProducer {
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaJsonSerializer.class.getName());
 		props.put(ProducerConfig.ACKS_CONFIG, "all");
-		props.put(ProducerConfig.CLIENT_ID_CONFIG, "the-track-gate");
+		props.put(ProducerConfig.CLIENT_ID_CONFIG, "the-unmoved-gate");
 		return props;
 	}
 
-	public void send(Track record) {
-		send(record.tracking_number, record);
+	public void send(Unmoved record) {
+		send(record.id, record);
 	}
 	
 	public void tombstone(final String key) {
 		send(key, null);
 	}
-
-	public void tombstone(final String key, final long delay) {
-		vertx.setTimer(delay, id -> {
-			send(key, null);
-		});
-	}
-
-	private void send(final String key, final Track value) {
+	
+	private void send(final String key, final Unmoved value) {
 		log.infof("Producing record: %s\t%s", key, value);
 
-		producer.send(new ProducerRecord<String, Track>(TOPIC, key, value), new Callback() {
+		producer.send(new ProducerRecord<String, Unmoved>(TOPIC, key, value), new Callback() {
 			@Override
 			public void onCompletion(RecordMetadata m, Exception e) {
 				if (e != null) {

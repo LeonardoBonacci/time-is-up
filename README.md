@@ -1,15 +1,16 @@
 # time-is-up
 
-- retest
+curl -sX POST http://localhost:8080/unmoved -d @payloads\mover.json --header "Content-Type: application/json" | jq
+curl -sX POST http://localhost:8080/unmoved -d @payloads\unmoved.json --header "Content-Type: application/json" | jq
+curl -sX POST http://localhost:8080/track -d @payloads\track.json --header "Content-Type: application/json" | jq
+
+curl -X DELETE -H "Content-type: application/json" http://localhost:8080/unmoved/Torpedo7Albany | jq
+curl -X DELETE -H "Content-type: application/json" http://localhost:8080/track/foo | jq
+
+
+
 - fix bug connector expire
-- read book on quarkus
-- test quarkus with avro
-- write quarkus native REST app 
-- change to json?
-- deploy a native container to Fargate
-- add arrival service / re-think ksqldb features - https://www.confluent.io/blog/ksqldb-0-10-0-latest-features-updates/
-- same: station-sink equivalent -> https://github.com/confluentinc/kafka-streams-examples/tree/5.5.1-post/src/main/java/io/confluent/examples/streams/interactivequeries/kafkamusic
-- dockerize kstream apps
+- deploy native containers to Fargate
 
 - https://www.confluent.io/blog/importance-of-distributed-tracing-for-apache-kafka-based-applications/
 - https://github.com/openzipkin-contrib/brave-kafka-interceptor
