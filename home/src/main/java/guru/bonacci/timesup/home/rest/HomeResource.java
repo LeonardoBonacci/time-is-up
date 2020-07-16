@@ -15,6 +15,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.kafka.common.errors.InterruptException;
+import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Timeout;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.jboss.logging.Logger;
+
 import guru.bonacci.timesup.home.consume.HomeConsumer;
 import guru.bonacci.timesup.home.model.Trace;
 import guru.bonacci.timesup.home.streams.InteractiveQueries;
@@ -25,6 +32,9 @@ import io.smallrye.mutiny.Multi;
 @Path("/home")
 public class HomeResource {
 
+	private final Logger log = Logger.getLogger(HomeResource.class);
+
+	
 	@Inject InteractiveQueries interactiveQueries;
 	@Inject HomeConsumer ksqlClient;
 
@@ -39,6 +49,10 @@ public class HomeResource {
 	@GET
 	@Path("/{unmovedId}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Timeout(250)
+	@Counted(description = "home traces info", absolute = true)
+	@CircuitBreaker(failOn = InterruptException.class, delay = 60000, requestVolumeThreshold = 10)
+	@Fallback(fallbackMethod = "fallbackDel")
 	public Response traces(@PathParam("unmovedId") String unmovedId) {
 		UnmovedDataResult result = interactiveQueries.getData(unmovedId);
 
@@ -51,6 +65,11 @@ public class HomeResource {
 			return Response.status(Status.NOT_FOUND.getStatusCode(), "No data found for unmoved " + unmovedId).build();
 		}
 	}
+
+	public Response fallbackTraces(String unmovedId) {
+        log.info("Falling back traces");
+        return Response.status(503).build();
+    }
 
 	@GET
 	@Path("/meta-data")

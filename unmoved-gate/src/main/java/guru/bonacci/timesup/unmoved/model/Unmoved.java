@@ -1,5 +1,7 @@
 package guru.bonacci.timesup.unmoved.model;
 
+import javax.validation.constraints.NotBlank;
+
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.ToString;
 
@@ -7,7 +9,9 @@ import lombok.ToString;
 @RegisterForReflection 
 public class Unmoved {
 
-    public String id;
-    public String lat;
-    public String lon;
+	@NotBlank(message="Where's the id?")
+	public String id;
+
+	public Double lat;
+    public Double lon;
 }

@@ -18,6 +18,7 @@
 			<groupId>io.confluent</groupId>
 			<artifactId>kafka-json-serializer</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-resteasy</artifactId>
