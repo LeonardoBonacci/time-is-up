@@ -49,10 +49,6 @@ public class TrackProducer {
 			send(record.tracking_number, record);
 	}
 	
-	public void tombstone(final String key) {
-		send(key, null);
-	}
-
 	public void tombstone(final String key, final long delay) {
 		vertx.setTimer(delay, id -> {
 			send(key, null);

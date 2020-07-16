@@ -35,8 +35,17 @@ public class TrackResource {
     @Path("/{nr}")
     public Response delete(@PathParam(value = "nr") String trackingNumber) {
     	log.infof("Deleting %s", trackingNumber);
-    	
-    	client.tombstone(trackingNumber, 10000);
+
+    	client.tombstone(trackingNumber, 1);
+		return Response.status(200).build();
+    }
+    
+    @DELETE 
+    @Path("/{nr}/delay/{ms}")
+    public Response delete(@PathParam(value = "nr") String trackingNumber, @PathParam(value = "ms") long delay) {
+    	log.infof("Deleting %s with delay %s ms", trackingNumber, delay);
+
+    	client.tombstone(trackingNumber, delay);
 		return Response.status(200).build();
     }
 }
