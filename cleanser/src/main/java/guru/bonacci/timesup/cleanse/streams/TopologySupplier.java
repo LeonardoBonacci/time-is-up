@@ -1,64 +1,56 @@
 package guru.bonacci.timesup.cleanse.streams;
 
-import java.time.Duration;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 
-import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.Grouped;
-import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.kstream.TimeWindows;
-import org.apache.kafka.streams.state.Stores;
-import org.apache.kafka.streams.state.WindowBytesStoreSupplier;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.logging.Logger;
 
-import guru.bonacci.kafka.serialization.JacksonSerde;
-import guru.bonacci.timesup.cleanse.model.Trace;
-import guru.bonacci.timesup.cleanse.model.UnmovedAggr;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import guru.bonacci.timesup.cleanse.rest.TrackEndpoint;
 
 
 @ApplicationScoped
 public class TopologySupplier {
 
-    public static final String STORE = "unmoved-store";
+	private final Logger log = Logger.getLogger(TopologySupplier.class);
 
-    private static final String HOMEWARD_TOPIC = "homeward";
-    
-    @Produces
+    static final String PICKUP_TOPIC = "pickup";
+	
+	@Inject
+	@RestClient
+	TrackEndpoint track;
+	
+	@Inject
+	ObjectMapper objectMapper;
+
+
+	@Produces
     public Topology buildTopology() {
         StreamsBuilder builder = new StreamsBuilder();
-
-        Serde<Trace> traceSerde = JacksonSerde.of(Trace.class);
-        Serde<UnmovedAggr> aggrSerde = JacksonSerde.of(UnmovedAggr.class, true);
         
-        // for demo purposes we retain data for 60 seconds..
-        WindowBytesStoreSupplier storeSupplier = 
-        		Stores.persistentWindowStore(STORE, 
-								        	 Duration.ofSeconds(60), 
-								        	 Duration.ofSeconds(60), 
-								        	 false);
-
-        builder.stream(
-                HOMEWARD_TOPIC,
-                Consumed.with(Serdes.String(), traceSerde)
+        builder.stream(PICKUP_TOPIC,
+                Consumed.with(Serdes.String(), Serdes.String())
             )
-        	.peek((k,v) -> System.out.println(k + "<before>" + v))
-        	.selectKey((key, value) -> value.UNMOVED_ID) 
-        	.groupByKey(Grouped.with(Serdes.String(), traceSerde))
-        	.windowedBy(TimeWindows.of(Duration.ofSeconds(15))) //.. in 15 second windows 
-            .aggregate( 
-                    UnmovedAggr::new,
-                    (unmovedId, trace, aggr) -> aggr.updateFrom(trace),
-                    Materialized.<String, UnmovedAggr> as(storeSupplier)
-                        .withKeySerde(Serdes.String())
-                        .withValueSerde(aggrSerde)
-            )
-            .toStream()
-        	.peek((k,v) -> System.out.println(k + "<after>" + v));
+        	.peek((k,v) -> log.infof("%s<pickup>%s", k, v))
+        	.mapValues(v -> {
+        		try {
+        			return objectMapper.readValue(v, Map.class).get("TRACKING_NUMBER");
+        		} catch (JsonProcessingException e) {
+        			return "Houston...";
+        		} 
+        	})
+        	.foreach((unused, trackingNumber) -> track.tombstone((String)trackingNumber));
+        
         return builder.build();
     }
 }

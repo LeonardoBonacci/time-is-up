@@ -45,7 +45,8 @@ public class TrackProducer {
 	}
 
 	public void send(Track record) {
-		send(record.tracking_number, record);
+		if (record != null)
+			send(record.tracking_number, record);
 	}
 	
 	public void tombstone(final String key) {

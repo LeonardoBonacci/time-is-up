@@ -15,6 +15,7 @@ import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.state.Stores;
 import org.apache.kafka.streams.state.WindowBytesStoreSupplier;
+import org.jboss.logging.Logger;
 
 import guru.bonacci.kafka.serialization.JacksonSerde;
 import guru.bonacci.timesup.home.model.Trace;
@@ -24,6 +25,9 @@ import guru.bonacci.timesup.home.model.UnmovedAggr;
 @ApplicationScoped
 public class TopologySupplier {
 
+	private final Logger log = Logger.getLogger(TopologySupplier.class);
+	
+	
     public static final String STORE = "unmoved-store";
 
     private static final String HOMEWARD_TOPIC = "homeward";
@@ -35,21 +39,20 @@ public class TopologySupplier {
         Serde<Trace> traceSerde = JacksonSerde.of(Trace.class);
         Serde<UnmovedAggr> aggrSerde = JacksonSerde.of(UnmovedAggr.class, true);
         
-        // for demo purposes we retain data for 60 seconds..
         WindowBytesStoreSupplier storeSupplier = 
         		Stores.persistentWindowStore(STORE, 
-								        	 Duration.ofSeconds(60), 
-								        	 Duration.ofSeconds(60), 
+								        	 Duration.ofSeconds(300), 
+								        	 Duration.ofSeconds(300), 
 								        	 false);
 
         builder.stream(
                 HOMEWARD_TOPIC,
                 Consumed.with(Serdes.String(), traceSerde)
             )
-        	.peek((k,v) -> System.out.println(k + "<before>" + v))
+        	.peek((k,v) -> log.infof("%s<before>%s", k, v))
         	.selectKey((key, value) -> value.UNMOVED_ID) 
         	.groupByKey(Grouped.with(Serdes.String(), traceSerde))
-        	.windowedBy(TimeWindows.of(Duration.ofSeconds(15))) //.. in 15 second windows 
+        	.windowedBy(TimeWindows.of(Duration.ofSeconds(30)))
             .aggregate( 
                     UnmovedAggr::new,
                     (unmovedId, trace, aggr) -> aggr.updateFrom(trace),
@@ -58,7 +61,7 @@ public class TopologySupplier {
                         .withValueSerde(aggrSerde)
             )
             .toStream()
-        	.peek((k,v) -> System.out.println(k + "<after>" + v));
+        	.peek((k,v) -> log.infof("%s<after>%s", k, v));
         return builder.build();
     }
 }

@@ -63,7 +63,7 @@ public class InteractiveQueries {
             log.info("Found data for key {} locally", unmovedId);
             
             // for demo purposes we query the last 30 seconds (of several windows)
-            KeyValueIterator<Long, UnmovedAggr> windows = getStore().fetch(unmovedId, Instant.now().minusSeconds(30), Instant.now());
+            KeyValueIterator<Long, UnmovedAggr> windows = getStore().fetch(unmovedId, Instant.now().minusSeconds(60), Instant.now());
             UnmovedAggr result = Streams.stream(windows).map(keyValue -> keyValue.value).reduce(new UnmovedAggr(), UnmovedAggr::merge);
 
             if (result != null) {

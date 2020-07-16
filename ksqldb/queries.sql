@@ -2,9 +2,7 @@ CREATE STREAM unmoved
  (rowkey VARCHAR KEY,
   id VARCHAR, --id in payload is used by connector
   lat DOUBLE,
-  lon DOUBLE
- )
-
+  lon DOUBLE)
  WITH (KAFKA_TOPIC = 'unmoved',
        VALUE_FORMAT = 'json',
        PARTITIONS = 1);
