@@ -25,15 +25,16 @@ public class MoverResource {
 	@POST
 	@Counted(description = "Mover additions", absolute = true)
 	public CompletionStage<Response> add(Mover mover) {
-		return client.send(mover)
-					 .thenApply(v -> Response.ok().build())
-					 .exceptionally(throwable -> {
-						if (throwable.getCause().getClass().equals(ValidationException.class)) {
-							return Response.status(422).build();
-						} else {
-							return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-						}
-					 }
+		return 
+			client.send(mover)
+				 .thenApply(v -> Response.ok().build())
+				 .exceptionally(throwable -> {
+					if (throwable.getCause().getClass().equals(ValidationException.class)) {
+						return Response.status(422).build();
+					} else {
+						return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+					}
+				 }
 		 );
 	}
 }

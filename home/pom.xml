@@ -46,9 +46,5 @@
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-kafka-client</artifactId>
 		</dependency>
-		<dependency>
-		    <groupId>com.google.guava</groupId>
-		    <artifactId>guava</artifactId>
-		</dependency>
 	</dependencies>
 </project>

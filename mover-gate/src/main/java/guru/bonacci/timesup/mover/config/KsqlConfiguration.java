@@ -17,7 +17,7 @@ public class KsqlConfiguration {
 	@Default
 	@Produces
 	Client ksqlClient() {
-		ClientOptions options = ClientOptions.create().setHost(KSQLDB_SERVER_HOST).setPort(KSQLDB_SERVER_HOST_PORT);
+		var options = ClientOptions.create().setHost(KSQLDB_SERVER_HOST).setPort(KSQLDB_SERVER_HOST_PORT);
 		return Client.create(options);
 	}
 }

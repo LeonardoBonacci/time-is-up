@@ -1,7 +1,11 @@
 package guru.bonacci.timesup.home.streams;
 
+import static java.util.stream.StreamSupport.stream;
+
 import java.time.Instant;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -16,8 +20,6 @@ import org.apache.kafka.streams.errors.InvalidStateStoreException;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyWindowStore;
-
-import com.google.common.collect.Streams;
 
 import guru.bonacci.timesup.home.model.UnmovedAggr;
 import guru.bonacci.timesup.home.rest.UnmovedDataResult;
@@ -64,7 +66,10 @@ public class InteractiveQueries {
             
             // for demo purposes we query the last 30 seconds (of several windows)
             KeyValueIterator<Long, UnmovedAggr> windows = getStore().fetch(unmovedId, Instant.now().minusSeconds(60), Instant.now());
-            UnmovedAggr result = Streams.stream(windows).map(keyValue -> keyValue.value).reduce(new UnmovedAggr(), UnmovedAggr::merge);
+    		UnmovedAggr result = 
+    				stream(Spliterators.spliteratorUnknownSize(windows, Spliterator.ORDERED), false)
+    				.map(keyValue -> keyValue.value)
+    				.reduce(new UnmovedAggr(), UnmovedAggr::merge);
 
             if (result != null) {
                 return UnmovedDataResult.found(UnmovedData.from(result));

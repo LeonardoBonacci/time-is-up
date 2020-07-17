@@ -28,11 +28,11 @@ public class MoverProducer {
 		if (mover == null || !validator.validate(mover).isEmpty()) {
 			log.warn("Suspicious incoming request");
 			return CompletableFuture.failedFuture(
-					new ValidationException("mid 16th century (earlier than valid ): from Latin invalidus, from in- 'not' + validus 'strong' "));
+				new ValidationException("mid 16th century (earlier than valid ): from Latin invalidus, from in- 'not' + validus 'strong' "));
 		}
 
 		log.infof("Producing record: %s", mover);
-		KsqlObject row = new KsqlObject().put("ID", mover.id).put("LAT", Double.valueOf(mover.lat)).put("LON", Double.valueOf(mover.lon));
+		var row = new KsqlObject().put("ID", mover.id).put("LAT", Double.valueOf(mover.lat)).put("LON", Double.valueOf(mover.lon));
 		return client.insertInto("MOVER", row);
 	}
 }
