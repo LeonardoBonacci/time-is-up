@@ -33,7 +33,7 @@ public class MoverResource {
 						} else {
 							return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 						}
-		 });
-
+					 }
+		 );
 	}
 }

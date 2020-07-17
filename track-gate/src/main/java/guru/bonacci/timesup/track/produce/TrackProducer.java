@@ -46,7 +46,7 @@ public class TrackProducer {
 		return props;
 	}
 
-	public void send(@Valid Track record) {
+	public void send(@Valid final Track record) {
 		if (record != null)
 			send (record.tracking_number, record);
 		else {

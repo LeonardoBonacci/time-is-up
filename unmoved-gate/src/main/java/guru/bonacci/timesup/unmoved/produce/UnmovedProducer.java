@@ -41,7 +41,7 @@ public class UnmovedProducer {
 		return props;
 	}
 
-	public void send(@Valid Unmoved record) {
+	public void send(@Valid final Unmoved record) {
 		if (record != null)
 			send(record.id, record);
 		else {
