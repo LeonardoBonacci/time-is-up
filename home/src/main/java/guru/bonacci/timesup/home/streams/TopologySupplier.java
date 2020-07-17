@@ -51,7 +51,6 @@ public class TopologySupplier {
                 Consumed.with(Serdes.String(), traceSerde)
             )
         	.peek((k,v) -> log.infof("%s<before>%s", k, v))
-        	.selectKey((key, value) -> value.UNMOVED_ID) 
         	.groupByKey(Grouped.with(Serdes.String(), traceSerde))
         	.windowedBy(TimeWindows.of(Duration.ofSeconds(30)))
             .aggregate( 

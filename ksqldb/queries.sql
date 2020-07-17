@@ -191,10 +191,3 @@ CREATE STREAM homeward
     FROM trace
     INNER JOIN geohash_avg_estimate_t as estimate ON trace.mover_geohash + '/' + trace.unmoved_geohash = estimate.hashkey
     PARTITION BY trace.unmoved_id;
-
-
-INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 'order1', 10);
-INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 'order2', 15);
-INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('foo', 'foo', 'bar', 100);
-INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 'order1', 5);
-INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 'order2', 2);

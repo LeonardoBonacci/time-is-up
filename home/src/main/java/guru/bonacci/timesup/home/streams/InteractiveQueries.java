@@ -65,7 +65,7 @@ public class InteractiveQueries {
         else if (metadata.getActiveHost().host().equals(host)) {
             log.info("Found data for key {} locally", unmovedId);
             
-            // for demo purposes we query the last 30 seconds (of several windows)
+            // for demo purposes we query the last 60 seconds (of several windows)
             KeyValueIterator<Long, UnmovedAggr> windows = getStore().fetch(unmovedId, Instant.now().minusSeconds(60), Instant.now());
     		UnmovedAggr result = 
     				stream(Spliterators.spliteratorUnknownSize(windows, Spliterator.ORDERED), false)
@@ -80,9 +80,8 @@ public class InteractiveQueries {
             }
         }
         else {
-//            log.info("Found data for key {} on remote host {}:{}", unmovedId, metadata.host(), metadata.port());
-//            return UnmovedDataResult.foundRemotely(metadata.host(), metadata.port());
-        	return null; //TODO
+            log.info("Found data for key {} on remote host {}:{}", unmovedId, metadata.getActiveHost().host(), metadata.getActiveHost().port());
+            return UnmovedDataResult.foundRemotely(metadata.getActiveHost().host(), metadata.getActiveHost().port());
         }
     }
 

@@ -52,7 +52,7 @@ public class HomeResource {
 	@Timeout(250)
 	@Counted(description = "home traces info", absolute = true)
 	@CircuitBreaker(failOn = InterruptException.class, delay = 60000, requestVolumeThreshold = 10)
-	@Fallback(fallbackMethod = "fallbackDel")
+	@Fallback(fallbackMethod = "fallbackTraces")
 	public Response traces(@PathParam("unmovedId") String unmovedId) {
 		UnmovedDataResult result = interactiveQueries.getData(unmovedId);
 

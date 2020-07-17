@@ -1,7 +1,6 @@
-version: '2'
-services:
+version: '3.5'
 
-  # FIRST THE KAFKA STACK
+services:
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.1
     hostname: zookeeper
@@ -11,6 +10,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - kafka-network
 
   broker:
     image: confluentinc/cp-server:5.5.1
@@ -30,6 +31,8 @@ services:
       KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - kafka-network
 
   control-center:
     image: confluentinc/cp-enterprise-control-center:5.5.1
@@ -51,6 +54,8 @@ services:
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021
+    networks:
+      - kafka-network
 
   ksqldb-server:
     image: confluentinc/ksqldb-server:0.10.1
@@ -83,6 +88,8 @@ services:
     volumes:
       - ./confluent-hub-components:/usr/share/kafka/plugins
       - ./ksqldb:/usr/ext #mounts a custom UDF jar for ksql
+    networks:
+      - kafka-network
 
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.10.1
@@ -92,19 +99,26 @@ services:
       - ksqldb-server
     entrypoint: /bin/sh
     tty: true
+    networks:
+      - kafka-network
 
-
-  # THEN THE OTHER STUFF
   tile38:
     image: tile38/tile38:edge
     ports:
       - "9851:9851"
+    networks:
+      - kafka-network
 
-  # tracker:
-  #   image: leonardobonacci/tracker
-  #   container_name: tracker
-  #   depends_on:
-  #     - broker
-  #     - ksqldb-server
-  #   ports:
-  #     - "8080:8080"
+  home:
+    image: leonardobonacci/home:latest
+    build:
+      context: home
+      dockerfile: src/main/docker/Dockerfile.${QUARKUS_MODE:-jvm}
+    environment:
+      QUARKUS_KAFKA_STREAMS_BOOTSTRAP_SERVERS: broker:29092
+    networks:
+      - kafka-network
+
+networks:
+  kafka-network:
+    name: kn
