@@ -3,6 +3,8 @@ package guru.bonacci.timesup.unmoved.produce;
 import java.util.Properties;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.validation.Valid;
+import javax.validation.ValidationException;
 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -39,10 +41,13 @@ public class UnmovedProducer {
 		return props;
 	}
 
-	public void send(Unmoved record) {
+	public void send(@Valid Unmoved record) {
 		if (record != null)
 			send(record.id, record);
-		else log.warn("Suspicious incoming request");
+		else {
+			log.warn("Suspicious incoming request");
+			throw new ValidationException("Empty request, why even try?");
+		}
 	}
 	
 	public void tombstone(final String key) {

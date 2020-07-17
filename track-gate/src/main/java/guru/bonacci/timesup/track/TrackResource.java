@@ -1,6 +1,7 @@
 package guru.bonacci.timesup.track;
 
 import javax.inject.Inject;
+import javax.validation.ValidationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
@@ -31,13 +32,17 @@ public class TrackResource {
 	@POST
 	@Timeout(250)
 	@Counted(description = "Track additions", absolute = true)
-	@CircuitBreaker(failOn = InterruptException.class, delay = 60000, requestVolumeThreshold = 10)
+	@CircuitBreaker(failOn = InterruptException.class)
 	@Fallback(fallbackMethod = "fallbackAdd")
     public Response add(Track track) {
 		log.infof("Adding %s", track);
 
-		client.send(track);
-    	return Response.status(200).build();
+		try {
+			client.send(track);
+			return Response.status(200).build();
+		} catch (ValidationException e) {
+			return Response.status(422).build();
+		}
     }
 
 	public Response fallbackAdd(Track track) {
@@ -49,7 +54,7 @@ public class TrackResource {
     @Path("/{nr}")
 	@Timeout(250)
 	@Counted(description = "Track deletes", absolute = true)
-	@CircuitBreaker(failOn = InterruptException.class, delay = 60000, requestVolumeThreshold = 10)
+	@CircuitBreaker(failOn = InterruptException.class)
 	@Fallback(fallbackMethod = "fallbackDel")
     public Response delete(@PathParam(value = "nr") String trackingNumber) {
     	log.infof("Deleting %s", trackingNumber);

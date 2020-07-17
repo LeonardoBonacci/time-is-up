@@ -1,7 +1,7 @@
 package guru.bonacci.timesup.unmoved;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
+import javax.validation.ValidationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
@@ -32,11 +32,17 @@ public class UnmovedResource {
 	@POST
 	@Timeout(250)
 	@Counted(description = "Unmoved additions", absolute = true)
-	@CircuitBreaker(failOn = InterruptException.class, delay = 60000, requestVolumeThreshold = 10)
+	@CircuitBreaker(failOn = InterruptException.class)
 	@Fallback(fallbackMethod = "fallbackAdd")
-	public Response add(@Valid Unmoved unmoved) {
-    	client.send(unmoved);
-    	return Response.status(200).build();
+	public Response add(Unmoved unmoved) {
+		log.infof("Adding %s", unmoved);
+
+		try {
+			client.send(unmoved);
+	    	return Response.status(200).build();
+		} catch (ValidationException e) {
+	    	return Response.status(422).build();
+	    }
     }
     
 	public Response fallbackAdd(Unmoved unmoved) {
@@ -48,9 +54,11 @@ public class UnmovedResource {
     @Path("/{id}")
 	@Timeout(250)
 	@Fallback(fallbackMethod = "fallbackDel")
-	@CircuitBreaker(failOn = InterruptException.class, delay = 60000, requestVolumeThreshold = 10)
+	@CircuitBreaker(failOn = InterruptException.class)
 	@Counted(description = "Unmoved deletes", absolute = true)
     public Response del(@PathParam(value = "id") String unmovedId) {
+    	log.infof("Deleting %s", unmovedId);
+
     	client.tombstone(unmovedId);
     	return Response.status(200).build();
     }

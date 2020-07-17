@@ -1,5 +1,9 @@
 package guru.bonacci.timesup.mover.model;
 
+import javax.validation.constraints.NotBlank;
+
+import org.hibernate.validator.constraints.Range;
+
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.ToString;
 
@@ -7,7 +11,12 @@ import lombok.ToString;
 @RegisterForReflection 
 public class Mover {
 
+	@NotBlank(message = "*id*")
     public String id;
-    public String lat;
-    public String lon;
+
+	@Range(min = -90, max = 90, message = "Where the lat are you?")
+	public String lat;
+    
+	@Range(min = -180, max = 80, message = "Where the lon are you?")
+	public String lon;
 }
