@@ -72,7 +72,6 @@ public class UnmovedProducer {
 			}
 		});
 
-		producer.flush();
 		log.infof("message sent to topic %s", topic);
 	}
 }

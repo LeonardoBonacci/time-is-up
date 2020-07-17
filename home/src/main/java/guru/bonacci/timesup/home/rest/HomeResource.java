@@ -49,7 +49,7 @@ public class HomeResource {
 	@GET
 	@Path("/{unmovedId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Timeout(250)
+	@Timeout(1000)
 	@Counted(description = "home traces info", absolute = true)
 	@CircuitBreaker(failOn = InterruptException.class, delay = 60000, requestVolumeThreshold = 10)
 	@Fallback(fallbackMethod = "fallbackTraces")

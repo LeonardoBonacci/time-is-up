@@ -30,7 +30,7 @@ public class TrackResource {
 	
 
 	@POST
-	@Timeout(250)
+	@Timeout(1000)
 	@Counted(description = "Track additions", absolute = true)
 	@CircuitBreaker(failOn = InterruptException.class)
 	@Fallback(fallbackMethod = "fallbackAdd")
@@ -52,7 +52,7 @@ public class TrackResource {
 
     @DELETE 
     @Path("/{nr}")
-	@Timeout(250)
+	@Timeout(1000)
 	@Counted(description = "Track deletes", absolute = true)
 	@CircuitBreaker(failOn = InterruptException.class)
 	@Fallback(fallbackMethod = "fallbackDel")

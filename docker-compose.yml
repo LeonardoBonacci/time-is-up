@@ -109,15 +109,15 @@ services:
     networks:
       - kafka-network
 
-  home:
-    image: leonardobonacci/home:latest
-    build:
-      context: home
-      dockerfile: src/main/docker/Dockerfile.${QUARKUS_MODE:-jvm}
-    environment:
-      QUARKUS_KAFKA_STREAMS_BOOTSTRAP_SERVERS: broker:29092
-    networks:
-      - kafka-network
+  # home:
+  #   image: leonardobonacci/home:latest
+  #   build:
+  #     context: home
+  #     dockerfile: src/main/docker/Dockerfile.${QUARKUS_MODE:-jvm}
+  #   environment:
+  #     QUARKUS_KAFKA_STREAMS_BOOTSTRAP_SERVERS: broker:29092
+  #   networks:
+  #     - kafka-network
 
 networks:
   kafka-network:

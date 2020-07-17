@@ -3,47 +3,36 @@ CREATE STREAM unmoved
   id VARCHAR, --id in payload is used by connector
   lat DOUBLE,
   lon DOUBLE)
- WITH (KAFKA_TOPIC = 'unmoved',
+ WITH (KAFKA_TOPIC = 'unmoved', --compacted topic
        VALUE_FORMAT = 'json',
-       PARTITIONS = 1);
-
-CREATE SINK CONNECTOR tile WITH (
-   'tasks.max' = '1',
-   'connector.class' = 'guru.bonacci.kafka.connect.tile38.Tile38SinkConnector',
-   'topics' = 'unmoved,trace',
-   'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
-   'value.converter' = 'org.apache.kafka.connect.json.JsonConverter',
-   'value.converter.schemas.enable' = false,
-   'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LAT event.LON',
-   'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.MOVER_LAT event.MOVER_LON',
-   'tile38.host' = 'tile38',
-   'tile38.port' = 9851);
-
--- topic arrival_raw: message.timestamp.type.LogAppendTime
--- docker run --net=host -it tile38/tile38 tile38-cli
--- SETHOOK arrivals kafka://broker:29092/arrival_raw NEARBY trace FENCE NODWELL ROAM unmoved * 100
+       PARTITIONS = 2);
 
 CREATE TABLE unmoved_t
     (id VARCHAR PRIMARY KEY,
      lat DOUBLE,
      lon DOUBLE)
   WITH (KAFKA_TOPIC = 'unmoved',
-       VALUE_FORMAT = 'json',
-       PARTITIONS = 1);
+       VALUE_FORMAT = 'json');
 
 CREATE STREAM track
  (tracking_number VARCHAR KEY,
   mover_id VARCHAR,
   unmoved_id VARCHAR
   )
- WITH (KAFKA_TOPIC = 'track',
+ WITH (KAFKA_TOPIC = 'track', --compacted topic & retention period 86400000 ms
        VALUE_FORMAT = 'json',
-       PARTITIONS = 1);
+       PARTITIONS = 12);
+
+CREATE STREAM track_repart
+  WITH (KAFKA_TOPIC = 'track_repart', --retention period 86400000 ms
+        VALUE_FORMAT = 'json',
+        PARTITIONS = 2)
+  AS SELECT * FROM track;
 
 CREATE STREAM track_geo
-  WITH (KAFKA_TOPIC = 'track_geo',
+  WITH (KAFKA_TOPIC = 'track_geo', --retention period 86400000 ms
         VALUE_FORMAT = 'json',
-        PARTITIONS = 1)
+        PARTITIONS = 12)
   AS SELECT
     track.mover_id,
     track.tracking_number,
@@ -51,7 +40,7 @@ CREATE STREAM track_geo
     GEOHASH(lat, lon, 8) AS unmoved_geohash,
     lat AS unmoved_lat,
     lon AS unmoved_lon
-  FROM track
+  FROM track_repart AS track
   INNER JOIN unmoved_t AS unmoved ON track.unmoved_id = unmoved.id
   PARTITION BY track.mover_id;
 
@@ -62,16 +51,15 @@ CREATE TABLE track_t
    mover_id VARCHAR,
    unmoved_id VARCHAR)
 WITH (KAFKA_TOPIC = 'track',
-     VALUE_FORMAT = 'json',
-     PARTITIONS = 1);
+     VALUE_FORMAT = 'json');
 
 CREATE STREAM mover
   (id VARCHAR KEY,
    lat DOUBLE,
    lon DOUBLE)
-  WITH (KAFKA_TOPIC='mover',
+  WITH (KAFKA_TOPIC='mover', --retention period 86400000 ms
         VALUE_FORMAT='json',
-        PARTITIONS = 1);
+        PARTITIONS = 12);
 
 -- GEOHASH MEANING
 --4 -> 39.1km x 19.5km
@@ -83,9 +71,9 @@ CREATE STREAM mover
 -- to facilitate filtering we join stream-stream and allow 24 hours of tracing
 -- after the track has been registred
 CREATE STREAM trace_unfiltered
-  WITH (KAFKA_TOPIC = 'trace_unfiltered',
+  WITH (KAFKA_TOPIC = 'trace_unfiltered', --retention period 86400000 ms
         VALUE_FORMAT = 'json',
-        PARTITIONS = 1)
+        PARTITIONS = 12)
   AS SELECT
           mover.id AS mover_id,
           mover.lat AS mover_lat,
@@ -107,8 +95,8 @@ CREATE STREAM trace_unfiltered
 
 
 -- sample data
-INSERT INTO unmoved (id, lat, lon) VALUES ('Torpedo7Albany', 1.0, 1.0);
-INSERT INTO unmoved (id, lat, lon) VALUES ('TEST', 10.0, -10.0);
+INSERT INTO unmoved (rowkey, id, lat, lon) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 1.0, 1.0);
+INSERT INTO unmoved (rowkey, id, lat, lon) VALUES ('Torpedo7Albany', 'TEST', 10.0, -10.0);
 INSERT INTO track (tracking_number, mover_id, unmoved_id) VALUES ('somenumber', 'thisisme', 'Torpedo7Albany');
 INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.90, 0.90);
 INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.71, 0.96);
@@ -117,9 +105,9 @@ INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 1.0, 1.0);
 
 -- include 'trace in progress' and exclude 'trace no longer in progress'
 CREATE STREAM trace
-  WITH (KAFKA_TOPIC = 'trace',
+  WITH (KAFKA_TOPIC = 'trace', --retention period 86400000 ms
         VALUE_FORMAT = 'json',
-        PARTITIONS = 1)
+        PARTITIONS = 12)
   AS SELECT
           trace.mover_id AS mover_id,
           trace.mover_lat AS mover_lat,
@@ -133,15 +121,31 @@ CREATE STREAM trace
   FROM trace_unfiltered AS trace
   INNER JOIN track_t AS track ON trace.tracking_number = track.tracking_number;
 
+CREATE SINK CONNECTOR tile WITH (
+   'tasks.max' = '1',
+   'connector.class' = 'guru.bonacci.kafka.connect.tile38.Tile38SinkConnector',
+   'topics' = 'unmoved,trace',
+   'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
+   'value.converter' = 'org.apache.kafka.connect.json.JsonConverter',
+   'value.converter.schemas.enable' = false,
+   'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LAT event.LON',
+   'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.MOVER_LAT event.MOVER_LON',
+   'tile38.host' = 'tile38',
+   'tile38.port' = 9851);
+
+-- topic arrival_raw: message.timestamp.type.LogAppendTime 2 partitions
+-- docker run --net=host -it tile38/tile38 tile38-cli
+-- SETHOOK arrivals kafka://broker:29092/arrival_raw NEARBY trace FENCE NODWELL ROAM unmoved * 100
+
 CREATE STREAM arrival_raw (id STRING, nearby STRUCT<id STRING>)
-  WITH (KAFKA_TOPIC = 'arrival_raw',
+  WITH (KAFKA_TOPIC = 'arrival_raw', --retention period 86400000 ms
         VALUE_FORMAT='json');
 
 -- 'nearby is not null' filters out the faraway messages
 CREATE STREAM arrival
-  WITH (KAFKA_TOPIC = 'arrival',
+  WITH (KAFKA_TOPIC = 'arrival', --retention period 86400000 ms
         VALUE_FORMAT = 'json',
-        PARTITIONS = 1)
+        PARTITIONS = 12)
   AS SELECT id as mover_id,
           nearby->id as unmoved_id
   FROM arrival_raw
@@ -150,9 +154,9 @@ CREATE STREAM arrival
 
 -- this stream can be used for multiple estimation algorithms
 CREATE STREAM pickup
-  WITH (KAFKA_TOPIC = 'pickup',
+  WITH (KAFKA_TOPIC = 'pickup', --infinite retention
         VALUE_FORMAT = 'json',
-        PARTITIONS = 1)
+        PARTITIONS = 12) --high for performant play back
     AS SELECT
       trace.mover_id AS mover_id,
       trace.mover_lat AS mover_lat,
@@ -169,9 +173,9 @@ CREATE STREAM pickup
     WHERE arrival.unmoved_id = trace.unmoved_id;
 
 CREATE TABLE geohash_avg_estimate_t
-  WITH (KAFKA_TOPIC = 'geohash_avg_estimate',
+  WITH (KAFKA_TOPIC = 'geohash_avg_estimate', --compacted topic --infinite retention
         VALUE_FORMAT = 'json',
-        PARTITIONS = 1)
+        PARTITIONS = 12)
     AS SELECT
       AVG(togo_ms) as togo_ms,
       (mover_geohash + '/' + unmoved_geohash) as hashkey
@@ -181,9 +185,9 @@ CREATE TABLE geohash_avg_estimate_t
 
 -- TODO behavior first time -> without avg'es?
 CREATE STREAM homeward
-    WITH (KAFKA_TOPIC = 'homeward',
+    WITH (KAFKA_TOPIC = 'homeward', --retention period 86400000 ms
           VALUE_FORMAT = 'json',
-          PARTITIONS = 1)
+          PARTITIONS = 12)
     AS SELECT
      trace.unmoved_id as unmoved_id,
      trace.tracking_number AS tracking_number,

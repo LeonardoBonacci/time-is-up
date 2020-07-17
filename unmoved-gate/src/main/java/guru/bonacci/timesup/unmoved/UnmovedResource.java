@@ -30,9 +30,9 @@ public class UnmovedResource {
 	
 
 	@POST
-	@Timeout(250)
+	@Timeout(1000)
 	@Counted(description = "Unmoved additions", absolute = true)
-	@CircuitBreaker(failOn = InterruptException.class)
+	@CircuitBreaker
 	@Fallback(fallbackMethod = "fallbackAdd")
 	public Response add(Unmoved unmoved) {
 		log.infof("Adding %s", unmoved);
@@ -52,7 +52,7 @@ public class UnmovedResource {
 
 	@DELETE 
     @Path("/{id}")
-	@Timeout(250)
+	@Timeout(1000)
 	@Fallback(fallbackMethod = "fallbackDel")
 	@CircuitBreaker(failOn = InterruptException.class)
 	@Counted(description = "Unmoved deletes", absolute = true)

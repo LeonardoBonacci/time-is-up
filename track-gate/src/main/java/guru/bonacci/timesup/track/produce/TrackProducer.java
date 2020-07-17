@@ -78,7 +78,6 @@ public class TrackProducer {
 			}
 		});
 
-		producer.flush();
 		log.infof("message sent to topic %s", topic);
 	}
 }

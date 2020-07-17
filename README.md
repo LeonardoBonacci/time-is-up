@@ -1,8 +1,16 @@
 # time-is-up
 
-curl -i -sX POST http://localhost:8081/mover -d @payloads\mover.json --header "Content-Type: application/json" | jq
-curl -i -sX POST http://localhost:8082/unmoved -d @payloads\unmoved.json --header "Content-Type: application/json" | jq
-curl -i -sX POST http://localhost:8083/track -d @payloads\track.json --header "Content-Type: application/json" | jq
+./kafka-console-consumer \
+     --bootstrap-server localhost:9092 \
+     --topic trace \
+     --key-deserializer org.apache.kafka.common.serialization.StringDeserializer \
+     --value-deserializer org.apache.kafka.connect.json.JsonDeserializer \
+     --property print.key=true \
+     --from-beginning
+
+curl -i -sX POST http://localhost:8082/unmoved -d @payloads\unmoved.json --header "Content-Type: application/json"
+curl -i -sX POST http://localhost:8083/track -d @payloads\track.json --header "Content-Type: application/json"
+curl -i -sX POST http://localhost:8081/mover -d @payloads\mover.json --header "Content-Type: application/json"
 
 curl -X DELETE -H "Content-type: application/json" http://localhost:8082/unmoved/Torpedo7Albany | jq
 curl -X DELETE -H "Content-type: application/json" http://localhost:8083/track/foo | jq
