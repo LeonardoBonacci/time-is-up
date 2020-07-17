@@ -10,6 +10,7 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
@@ -24,8 +25,12 @@ public class TopologySupplier {
 
 	private final Logger log = Logger.getLogger(TopologySupplier.class);
 
-    static final String PICKUP_TOPIC = "pickup";
-	
+	@ConfigProperty(name = "kafka.topic", defaultValue = "pickup") 
+	String topic;
+
+	@ConfigProperty(name = "cleanse.delay", defaultValue = "60000") 
+	int delay;
+
 	@Inject
 	@RestClient
 	TrackEndpoint track;
@@ -38,7 +43,7 @@ public class TopologySupplier {
     public Topology buildTopology() {
         StreamsBuilder builder = new StreamsBuilder();
         
-        builder.stream(PICKUP_TOPIC,
+        builder.stream(topic,
                 Consumed.with(Serdes.String(), Serdes.String())
             )
         	.peek((k,v) -> log.infof("%s<pickup>%s", k, v))
@@ -49,7 +54,7 @@ public class TopologySupplier {
         			return "Houston...";
         		} 
         	})
-        	.foreach((unused, trackingNumber) -> track.tombstone((String)trackingNumber));
+        	.foreach((unused, trackingNumber) -> track.tombstone((String)trackingNumber, delay));
         
         return builder.build();
     }

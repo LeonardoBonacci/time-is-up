@@ -15,6 +15,7 @@ import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.state.Stores;
 import org.apache.kafka.streams.state.WindowBytesStoreSupplier;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import guru.bonacci.kafka.serialization.JacksonSerde;
@@ -27,11 +28,12 @@ public class TopologySupplier {
 
 	private final Logger log = Logger.getLogger(TopologySupplier.class);
 	
-	
     public static final String STORE = "unmoved-store";
 
-    private static final String HOMEWARD_TOPIC = "homeward";
-    
+	@ConfigProperty(name = "kafka.topic", defaultValue = "homeward") 
+	String topic;
+
+	
     @Produces
     public Topology buildTopology() {
         StreamsBuilder builder = new StreamsBuilder();
@@ -44,9 +46,8 @@ public class TopologySupplier {
 								        	 Duration.ofSeconds(300), 
 								        	 Duration.ofSeconds(300), 
 								        	 false);
-
         builder.stream(
-                HOMEWARD_TOPIC,
+                topic,
                 Consumed.with(Serdes.String(), traceSerde)
             )
         	.peek((k,v) -> log.infof("%s<before>%s", k, v))

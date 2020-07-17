@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import guru.bonacci.timesup.mover.model.Mover;
@@ -17,6 +18,9 @@ import io.confluent.ksql.api.client.KsqlObject;
 public class MoverProducer {
 
 	private final Logger log = Logger.getLogger(MoverProducer.class);
+
+	@ConfigProperty(name = "ksql.stream.name", defaultValue = "MOVER") 
+	String ksqlStream;
 	
 	@Inject
 	Validator validator;
@@ -24,6 +28,7 @@ public class MoverProducer {
 	@Inject
 	Client client;
 
+	
 	public CompletableFuture<Void> send(final Mover mover) {
 		if (mover == null || !validator.validate(mover).isEmpty()) {
 			log.warn("Suspicious incoming request");
@@ -33,6 +38,6 @@ public class MoverProducer {
 
 		log.infof("Producing record: %s", mover);
 		var row = new KsqlObject().put("ID", mover.id).put("LAT", Double.valueOf(mover.lat)).put("LON", Double.valueOf(mover.lon));
-		return client.insertInto("MOVER", row);
+		return client.insertInto(ksqlStream, row);
 	}
 }

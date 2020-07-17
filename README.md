@@ -1,11 +1,11 @@
 # time-is-up
 
-curl -sX POST http://localhost:8080/unmoved -d @payloads\mover.json --header "Content-Type: application/json" | jq
-curl -sX POST http://localhost:8080/unmoved -d @payloads\unmoved.json --header "Content-Type: application/json" | jq
-curl -sX POST http://localhost:8080/track -d @payloads\track.json --header "Content-Type: application/json" | jq
+curl -i -sX POST http://localhost:8081/mover -d @payloads\mover.json --header "Content-Type: application/json" | jq
+curl -i -sX POST http://localhost:8082/unmoved -d @payloads\unmoved.json --header "Content-Type: application/json" | jq
+curl -i -sX POST http://localhost:8083/track -d @payloads\track.json --header "Content-Type: application/json" | jq
 
-curl -X DELETE -H "Content-type: application/json" http://localhost:8080/unmoved/Torpedo7Albany | jq
-curl -X DELETE -H "Content-type: application/json" http://localhost:8080/track/foo | jq
+curl -X DELETE -H "Content-type: application/json" http://localhost:8082/unmoved/Torpedo7Albany | jq
+curl -X DELETE -H "Content-type: application/json" http://localhost:8083/track/foo | jq
 
 
 
@@ -18,6 +18,4 @@ curl -X DELETE -H "Content-type: application/json" http://localhost:8080/track/f
 - tracing zipkin
 - deploy Kafka to AWS after KIP-500
 - in AWS: ELK
-- producers can write straight to ksql-streams
-
 - linear regression?

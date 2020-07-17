@@ -20,6 +20,7 @@ import org.apache.kafka.streams.errors.InvalidStateStoreException;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyWindowStore;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import guru.bonacci.timesup.home.model.UnmovedAggr;
 import guru.bonacci.timesup.home.rest.UnmovedDataResult;
@@ -30,8 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class InteractiveQueries {
 
 
-//TODO	@ConfigProperty(name = "hostname")
-    String host = "localhost";
+	@ConfigProperty(name = "hostname", defaultValue = "localhost")
+    String host;
 
     @Inject
     KafkaStreams streams;

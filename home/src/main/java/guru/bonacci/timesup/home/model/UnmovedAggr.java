@@ -1,8 +1,7 @@
 package guru.bonacci.timesup.home.model;
 
+import java.util.HashMap;
 import java.util.Map;
-
-import com.google.common.collect.Maps;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.ToString;
@@ -12,7 +11,7 @@ import lombok.ToString;
 public class UnmovedAggr {
 
 	public String unmovedId;
-	public Map<String, TraceAggr> traces = Maps.newHashMap();
+	public Map<String, TraceAggr> traces = new HashMap<>();
 	
 	public UnmovedAggr updateFrom(Trace incoming) {
 		this.unmovedId = incoming.UNMOVED_ID;

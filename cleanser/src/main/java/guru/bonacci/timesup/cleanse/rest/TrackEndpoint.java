@@ -12,6 +12,6 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 public interface TrackEndpoint {
 
 	@DELETE
-	@Path("/{nr}/delay/60000")
-	Response tombstone(@PathParam("nr") String trackingNumber);
+	@Path("/{nr}/delay/{delay}")
+	Response tombstone(@PathParam("nr") String trackingNumber, @PathParam("delay") int ms);
 }
