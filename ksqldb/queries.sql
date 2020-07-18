@@ -95,13 +95,14 @@ CREATE STREAM trace_unfiltered
 
 
 -- sample data
+/*
 INSERT INTO unmoved (rowkey, id, lat, lon) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 1.0, 1.0);
 INSERT INTO unmoved (rowkey, id, lat, lon) VALUES ('Torpedo7Albany', 'TEST', 10.0, -10.0);
 INSERT INTO track (tracking_number, mover_id, unmoved_id) VALUES ('somenumber', 'thisisme', 'Torpedo7Albany');
 INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.90, 0.90);
 INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.71, 0.96);
 INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 1.0, 1.0);
-
+*/
 
 -- include 'trace in progress' and exclude 'trace no longer in progress'
 CREATE STREAM trace
@@ -131,15 +132,17 @@ CREATE SINK CONNECTOR tile WITH (
    'tile38.topic.unmoved' = 'SET unmoved event.ID POINT event.LAT event.LON',
    'tile38.topic.trace' = 'SET trace event.MOVER_ID POINT event.MOVER_LAT event.MOVER_LON',
    'tile38.host' = 'tile38',
-   'tile38.port' = 9851);
+   'tile38.port' = 9851
+ );
 
--- topic arrival_raw: message.timestamp.type.LogAppendTime 2 partitions
--- docker run --net=host -it tile38/tile38 tile38-cli
+-- topic arrival_raw: message.timestamp.type:LogAppendTime
+-- docker run --net=host -it tile38/tile38:edge tile38-cli
 -- SETHOOK arrivals kafka://broker:29092/arrival_raw NEARBY trace FENCE NODWELL ROAM unmoved * 100
 
 CREATE STREAM arrival_raw (id STRING, nearby STRUCT<id STRING>)
   WITH (KAFKA_TOPIC = 'arrival_raw', --retention period 86400000 ms
-        VALUE_FORMAT='json');
+        VALUE_FORMAT='json',
+        PARTITIONS=2);
 
 -- 'nearby is not null' filters out the faraway messages
 CREATE STREAM arrival

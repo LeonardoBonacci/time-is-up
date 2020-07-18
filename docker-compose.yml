@@ -11,7 +11,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      - kafka-network
+      - time-network
 
   broker:
     image: confluentinc/cp-server:5.5.1
@@ -32,7 +32,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     networks:
-      - kafka-network
+      - time-network
 
   control-center:
     image: confluentinc/cp-enterprise-control-center:5.5.1
@@ -55,7 +55,7 @@ services:
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021
     networks:
-      - kafka-network
+      - time-network
 
   ksqldb-server:
     image: confluentinc/ksqldb-server:0.10.1
@@ -89,7 +89,7 @@ services:
       - ./confluent-hub-components:/usr/share/kafka/plugins
       - ./ksqldb:/usr/ext #mounts a custom UDF jar for ksql
     networks:
-      - kafka-network
+      - time-network
 
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.10.1
@@ -100,25 +100,50 @@ services:
     entrypoint: /bin/sh
     tty: true
     networks:
-      - kafka-network
+      - time-network
 
   tile38:
     image: tile38/tile38:edge
     ports:
       - "9851:9851"
     networks:
-      - kafka-network
+      - time-network
 
-  # home:
-  #   image: leonardobonacci/home:latest
-  #   build:
-  #     context: home
-  #     dockerfile: src/main/docker/Dockerfile.${QUARKUS_MODE:-jvm}
-  #   environment:
-  #     QUARKUS_KAFKA_STREAMS_BOOTSTRAP_SERVERS: broker:29092
-  #   networks:
-  #     - kafka-network
+  unmoved-gate:
+    image: leonardobonacci/timesup-unmoved-gate:1.0
+    environment:
+      QUARKUS_KAFKA_STREAMS_BOOTSTRAP_SERVERS: broker:29092
+    networks:
+      - time-network
+
+  track-gate:
+    image: leonardobonacci/timesup-track-gate:1.0
+    environment:
+      QUARKUS_KAFKA_STREAMS_BOOTSTRAP_SERVERS: broker:29092
+    networks:
+      - time-network
+
+  mover-gate:
+    image: leonardobonacci/timesup-mover-gate:1.0
+    environment:
+      QUARKUS_KAFKA_STREAMS_BOOTSTRAP_SERVERS: broker:29092
+    networks:
+      - time-network
+
+  cleanser:
+    image: leonardobonacci/timesup-cleanser:1.0
+    environment:
+      QUARKUS_KAFKA_STREAMS_BOOTSTRAP_SERVERS: broker:29092
+    networks:
+      - time-network
+
+  home:
+    image: leonardobonacci/timesup-home:1.0
+    environment:
+      QUARKUS_KAFKA_STREAMS_BOOTSTRAP_SERVERS: broker:29092
+    networks:
+      - time-network
 
 networks:
-  kafka-network:
-    name: kn
+  time-network:
+    name: tn

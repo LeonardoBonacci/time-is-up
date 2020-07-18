@@ -1,5 +1,9 @@
 # time-is-up
 
+mvn package -Pnative -Dquarkus.profile=docker -Dquarkus.native.container-build=true
+docker build -f src/main/docker/Dockerfile.native -t leonardobonacci/timestup-track-gate:1.0 .
+docker push leonardobonacci/timesup-track-gate:1.0
+
 ./kafka-console-consumer \
      --bootstrap-server localhost:9092 \
      --topic trace \
@@ -19,9 +23,9 @@ curl -X GET -H "Content-type: application/json" http://localhost:8080/home/Torpe
 
 docker-compose up -d --scale home=3
 
-docker run --tty --rm -i --network kn debezium/tooling:1.0
+docker run --tty --rm -i --network tn debezium/tooling:1.0
 http home:8080/home/meta-data
-http 2af13fe516a9:8080/home/Torpedo7Albany
+http a1ae0c7a5cd9:8080/home/Torpedo7Albany
 http --follow 2af13fe516a9:8080/home/Torpedo7Albany
 
 - deploy native containers to Fargate

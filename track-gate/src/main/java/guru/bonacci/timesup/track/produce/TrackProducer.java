@@ -50,7 +50,7 @@ public class TrackProducer {
 
 	public void send(@Valid final Track record) {
 		if (record != null)
-			send(record.tracking_number, record);
+			send(record.TRACKING_NUMBER, record);
 		else {
 			log.warn("Suspicious incoming request");
 			throw new ValidationException("Empty request, why even try?");

@@ -37,7 +37,7 @@ public class MoverProducer {
 		}
 
 		log.infof("Producing record: %s", mover);
-		var row = new KsqlObject().put("ID", mover.id).put("LAT", Double.valueOf(mover.lat)).put("LON", Double.valueOf(mover.lon));
+		var row = new KsqlObject().put("ID", mover.ID).put("LAT", Double.valueOf(mover.LAT)).put("LON", Double.valueOf(mover.LON));
 		return client.insertInto(ksqlStream, row);
 	}
 }
