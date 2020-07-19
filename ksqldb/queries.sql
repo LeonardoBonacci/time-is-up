@@ -93,17 +93,6 @@ CREATE STREAM trace_unfiltered
   FROM mover
   INNER JOIN track_geo AS track WITHIN (1 DAY, 0 SECONDS) ON mover.id = track.mover_id;
 
-
--- sample data
-/*
-INSERT INTO unmoved (rowkey, id, lat, lon) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 1.0, 1.0);
-INSERT INTO unmoved (rowkey, id, lat, lon) VALUES ('Torpedo7Albany', 'TEST', 10.0, -10.0);
-INSERT INTO track (tracking_number, mover_id, unmoved_id) VALUES ('somenumber', 'thisisme', 'Torpedo7Albany');
-INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.90, 0.90);
-INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 0.71, 0.96);
-INSERT INTO mover (id, lat, lon) VALUES ('thisisme', 1.0, 1.0);
-*/
-
 -- include 'trace in progress' and exclude 'trace no longer in progress'
 CREATE STREAM trace
   WITH (KAFKA_TOPIC = 'trace', --retention period 86400000 ms
