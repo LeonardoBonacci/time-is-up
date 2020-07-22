@@ -30,3 +30,13 @@ INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Tor
 INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('foo', 'foo', 'bar', 100);
 INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 'order1', 5);
 INSERT INTO homeward (rowkey, unmoved_id, tracking_number, togo_ms) VALUES ('Torpedo7Albany', 'Torpedo7Albany', 'order2', 2);
+
+
+
+CREATE STREAM mover
+  (id VARCHAR KEY,
+   lat DOUBLE,
+   lon DOUBLE)
+  WITH (KAFKA_TOPIC='mover', --retention period 86400000 ms
+        VALUE_FORMAT='json',
+        PARTITIONS = 12);

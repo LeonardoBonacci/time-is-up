@@ -144,6 +144,28 @@ services:
     networks:
       - time-network
 
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.1
+    hostname: elasticsearch
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - time-network
+
+  kib:
+    image: docker.elastic.co/kibana/kibana:7.7.1
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://es:9200
+      ELASTICSEARCH_HOSTS: http://es:9200
+    networks:
+      - time-network
+
 networks:
   time-network:
     name: tn

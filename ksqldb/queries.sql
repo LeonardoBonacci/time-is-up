@@ -187,3 +187,25 @@ CREATE STREAM homeward
     FROM trace
     INNER JOIN geohash_avg_estimate_t as estimate ON trace.mover_geohash + '/' + trace.unmoved_geohash = estimate.hashkey
     PARTITION BY trace.unmoved_id;
+
+
+CREATE STREAM mover_to_es
+  WITH (KAFKA_TOPIC = 'mover_to_es',
+        VALUE_FORMAT = 'json',
+        PARTITIONS = 12)
+  AS SELECT
+    id AS mover_id,
+    STRUCT("lat" := lat, "lon" := lon) AS "location"
+  FROM mover;
+
+
+CREATE SINK CONNECTOR es WITH (
+   'connector.class' = 'io.confluent.connect.elasticsearch.ElasticsearchSinkConnector',
+   'type.name' = '_doc',
+   'topics' = 'mover_to_es',
+   'schema.ignore' = true,
+   'connection.url' = 'http://es:9200',
+   'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
+   'value.converter' = 'org.apache.kafka.connect.json.JsonConverter',
+   'value.converter.schemas.enable' = false
+ );

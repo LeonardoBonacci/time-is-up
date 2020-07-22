@@ -4,6 +4,11 @@
 - docker build -f src/main/docker/Dockerfile.native -t leonardobonacci/timestup-track-gate:1.0 .
 - docker push leonardobonacci/timesup-track-gate:1.0
 
+- http put localhost:9200/mover_to_es
+- http localhost:9200/_ cat/indices
+- http delete localhost:9200/mover_to_es
+- http put localhost:9200/mover_to_es < elasticsearch/mapping.json
+
 ./kafka-console-consumer \
      --bootstrap-server localhost:9092 \
      --topic trace \
@@ -39,5 +44,3 @@ curl -X GET -H "Content-type: application/json" http://localhost:8080/home/Torpe
 ![delete diagram](pictures/02.jpeg)
 
 ![architecture diagram](pictures/03.jpeg)
-
-
