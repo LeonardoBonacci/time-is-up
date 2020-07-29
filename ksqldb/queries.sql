@@ -164,8 +164,8 @@ CREATE STREAM pickup
     INNER JOIN arrival as arrival WITHIN (0 MILLISECONDS, 1 HOUR) ON arrival.mover_id = trace.mover_id
     WHERE arrival.unmoved_id = trace.unmoved_id;
 
-CREATE TABLE geohash_avg_estimate_t
-  WITH (KAFKA_TOPIC = 'geohash_avg_estimate', --compacted topic --infinite retention
+CREATE TABLE geohash_averager_t
+  WITH (KAFKA_TOPIC = 'geohash_averager', --compacted topic --infinite retention
         VALUE_FORMAT = 'json',
         PARTITIONS = 12)
     AS SELECT
@@ -175,7 +175,7 @@ CREATE TABLE geohash_avg_estimate_t
       GROUP BY (mover_geohash + '/' + unmoved_geohash)
       EMIT CHANGES;
 
--- TODO behavior first time -> without avg'es?
+
 CREATE STREAM homeward
     WITH (KAFKA_TOPIC = 'homeward', --retention period 86400000 ms
           VALUE_FORMAT = 'json',
@@ -185,19 +185,21 @@ CREATE STREAM homeward
      trace.tracking_number AS tracking_number,
      estimate.togo_ms as togo_ms
     FROM trace
-    INNER JOIN geohash_avg_estimate_t as estimate ON trace.mover_geohash + '/' + trace.unmoved_geohash = estimate.hashkey
+    INNER JOIN geohash_averager_t as estimate ON trace.mover_geohash + '/' + trace.unmoved_geohash = estimate.hashkey
     PARTITION BY trace.unmoved_id;
 
 
 CREATE STREAM mover_to_es
   WITH (KAFKA_TOPIC = 'mover_to_es',
         VALUE_FORMAT = 'json',
+        TIMESTAMP='`@timestamp`',
         PARTITIONS = 12)
   AS SELECT
-    id AS mover_id,
-    STRUCT("lat" := lat, "lon" := lon) AS "location"
+    id,
+    AS_VALUE(id) AS "mover_id",
+    STRUCT("lat" := lat, "lon" := lon) AS "location",
+    rowtime AS `@timestamp`
   FROM mover;
-
 
 CREATE SINK CONNECTOR es WITH (
    'connector.class' = 'io.confluent.connect.elasticsearch.ElasticsearchSinkConnector',
@@ -205,6 +207,7 @@ CREATE SINK CONNECTOR es WITH (
    'topics' = 'mover_to_es',
    'schema.ignore' = true,
    'connection.url' = 'http://es:9200',
+   'key.ignore' = true,
    'key.converter' = 'org.apache.kafka.connect.storage.StringConverter',
    'value.converter' = 'org.apache.kafka.connect.json.JsonConverter',
    'value.converter.schemas.enable' = false

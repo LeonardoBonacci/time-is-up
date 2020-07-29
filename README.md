@@ -4,10 +4,11 @@
 - docker build -f src/main/docker/Dockerfile.native -t leonardobonacci/timestup-track-gate:1.0 .
 - docker push leonardobonacci/timesup-track-gate:1.0
 
-- http put localhost:9200/mover_to_es
+- http put localhost:9200/mover_to_es < elasticsearch/mapping.json
 - http localhost:9200/_ cat/indices
 - http delete localhost:9200/mover_to_es
-- http put localhost:9200/mover_to_es < elasticsearch/mapping.json
+
+- From the Kibana homepage, click App Maps > Create Map > Add Layer > {Select Data Source} > Documents > Index Pattern > Add Layer.
 
 ./kafka-console-consumer \
      --bootstrap-server localhost:9092 \

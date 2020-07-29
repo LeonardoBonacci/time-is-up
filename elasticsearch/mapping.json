@@ -7,7 +7,7 @@
             "format": "epoch_millis",
             "type": "date"
           },
-          "match": "TS"
+          "match": "@timestamp"
         }
       },
       {
