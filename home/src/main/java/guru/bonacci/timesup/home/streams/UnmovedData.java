@@ -5,6 +5,8 @@ import static java.util.Comparator.comparingLong;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 import guru.bonacci.timesup.home.model.UnmovedAggr;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.AllArgsConstructor;
@@ -18,6 +20,7 @@ import lombok.ToString;
 @RegisterForReflection
 public class UnmovedData {
 
+	@JsonbProperty("unmoved_id")
     public String unmovedId;
     public List<TraceData> expected;
     
