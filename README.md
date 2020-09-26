@@ -1,5 +1,7 @@
 # time-is-up
 
+[Medium](https://medium.com/@jvh1234/the-goal-b43c0745f6f2)
+
 - mvn package -Pnative -Dquarkus.profile=docker -Dquarkus.native.container-build=true
 - docker build -f src/main/docker/Dockerfile.native -t leonardobonacci/timestup-track-gate:1.0 .
 - docker push leonardobonacci/timesup-track-gate:1.0
