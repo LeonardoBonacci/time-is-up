@@ -20,7 +20,7 @@ public class UnmovedResource {
 
 	@Inject @Channel("unmoved-channel") Emitter<Unmoved> emitter;
 	
-	@POST //http POST localhost:8080/unmoved < payload.json
+	@POST //http POST localhost:8080/track < src/main/resources/payload.json
 	@Consumes(MediaType.APPLICATION_JSON)
     public void add(@Valid Unmoved unmoved) {
 		emitter.send(KafkaRecord.of(unmoved.id, unmoved));
