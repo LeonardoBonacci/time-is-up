@@ -53,6 +53,9 @@ CREATE TABLE track_t
 WITH (KAFKA_TOPIC = 'track',
      VALUE_FORMAT = 'json');
 
+--------------------------------------------------------------------------------
+
+
 CREATE STREAM mover
   (id VARCHAR KEY,
    lat DOUBLE,
