@@ -1,19 +1,15 @@
-package guru.bonacci.timesup.trackgeo.model;
+package guru.bonacci.timesup.tracefilter.model;
 
 import javax.json.bind.annotation.JsonbProperty;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Builder
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
 @RegisterForReflection 
-public class TrackGeo {
+public class Trace {
 
 	@JsonbProperty("mover_id") public String moverId;
 	@JsonbProperty("tracking_number") public String trackingNumber;

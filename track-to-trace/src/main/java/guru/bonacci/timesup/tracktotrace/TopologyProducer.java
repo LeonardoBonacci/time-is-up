@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.trackgeo;
+package guru.bonacci.timesup.tracktotrace;
 
 import java.time.Duration;
 
@@ -15,13 +15,13 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.StreamJoined;
 
-import guru.bonacci.timesup.trackgeo.joiners.MoverTrackGeoJoiner;
-import guru.bonacci.timesup.trackgeo.joiners.TrackUnmovedJoiner;
-import guru.bonacci.timesup.trackgeo.model.Mover;
-import guru.bonacci.timesup.trackgeo.model.Trace;
-import guru.bonacci.timesup.trackgeo.model.Track;
-import guru.bonacci.timesup.trackgeo.model.TrackGeo;
-import guru.bonacci.timesup.trackgeo.model.Unmoved;
+import guru.bonacci.timesup.tracktotrace.joiners.MoverTrackGeoJoiner;
+import guru.bonacci.timesup.tracktotrace.joiners.TrackUnmovedJoiner;
+import guru.bonacci.timesup.tracktotrace.model.Mover;
+import guru.bonacci.timesup.tracktotrace.model.Trace;
+import guru.bonacci.timesup.tracktotrace.model.Track;
+import guru.bonacci.timesup.tracktotrace.model.TrackGeo;
+import guru.bonacci.timesup.tracktotrace.model.Unmoved;
 import io.quarkus.kafka.client.serialization.JsonbSerde;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +33,7 @@ public class TopologyProducer {
     private static final String TRACK_TOPIC = "track";
     private static final String TRACK_GEO_TOPIC = "track-geo";
     private static final String MOVER_TOPIC = "mover";
-    private static final String TRACE_TOPIC = "trace";
+    private static final String TRACE_RAW_TOPIC = "trace_raw";
 
     
     @Produces
@@ -82,10 +82,10 @@ public class TopologyProducer {
                 StreamJoined.with(Serdes.String(), new JsonbSerde<>(Mover.class), new JsonbSerde<>(TrackGeo.class)) 
         )
         .peek(
-        		(k,v) -> log.debug("Outgoing... {}:{}", k, v)
+        		(k,v) -> log.debug("Outgoing mover... {}:{}", k, v)
         )
         .to(
-        		TRACE_TOPIC,
+        		TRACE_RAW_TOPIC,
         		Produced.with(Serdes.String(), new JsonbSerde<>(Trace.class))
         );
         
