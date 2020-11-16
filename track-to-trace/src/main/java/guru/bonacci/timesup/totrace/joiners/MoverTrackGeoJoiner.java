@@ -1,10 +1,10 @@
-package guru.bonacci.timesup.tracktotrace.joiners;
+package guru.bonacci.timesup.totrace.joiners;
 
 import org.apache.kafka.streams.kstream.ValueJoiner;
 
-import guru.bonacci.timesup.tracktotrace.model.Mover;
-import guru.bonacci.timesup.tracktotrace.model.Trace;
-import guru.bonacci.timesup.tracktotrace.model.TrackGeo;
+import guru.bonacci.timesup.totrace.model.Mover;
+import guru.bonacci.timesup.totrace.model.Trace;
+import guru.bonacci.timesup.totrace.model.TrackGeo;
 
 public class MoverTrackGeoJoiner implements ValueJoiner<Mover, TrackGeo, Trace> {
 

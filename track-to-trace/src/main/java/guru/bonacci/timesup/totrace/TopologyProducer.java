@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.tracktotrace;
+package guru.bonacci.timesup.totrace;
 
 import java.time.Duration;
 
@@ -15,13 +15,13 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.StreamJoined;
 
-import guru.bonacci.timesup.tracktotrace.joiners.MoverTrackGeoJoiner;
-import guru.bonacci.timesup.tracktotrace.joiners.TrackUnmovedJoiner;
-import guru.bonacci.timesup.tracktotrace.model.Mover;
-import guru.bonacci.timesup.tracktotrace.model.Trace;
-import guru.bonacci.timesup.tracktotrace.model.Track;
-import guru.bonacci.timesup.tracktotrace.model.TrackGeo;
-import guru.bonacci.timesup.tracktotrace.model.Unmoved;
+import guru.bonacci.timesup.totrace.joiners.MoverTrackGeoJoiner;
+import guru.bonacci.timesup.totrace.joiners.TrackUnmovedJoiner;
+import guru.bonacci.timesup.totrace.model.Mover;
+import guru.bonacci.timesup.totrace.model.Trace;
+import guru.bonacci.timesup.totrace.model.Track;
+import guru.bonacci.timesup.totrace.model.TrackGeo;
+import guru.bonacci.timesup.totrace.model.Unmoved;
 import io.quarkus.kafka.client.serialization.JsonbSerde;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,11 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 @ApplicationScoped
 public class TopologyProducer {
 
-    private static final String UNMOVED_TOPIC = "unmoved";
-    private static final String TRACK_TOPIC = "track";
-    private static final String TRACK_GEO_TOPIC = "track-geo";
-    private static final String MOVER_TOPIC = "mover";
-    private static final String TRACE_RAW_TOPIC = "trace_raw";
+    static final String UNMOVED_TOPIC = "unmoved";
+    static final String TRACK_TOPIC = "track";
+    static final String TRACK_GEO_TOPIC = "track-geo";
+    static final String MOVER_TOPIC = "mover";
+    static final String TRACE_UNFILTERED_TOPIC = "trace-unfiltered";
 
     
     @Produces
@@ -85,7 +85,7 @@ public class TopologyProducer {
         		(k,v) -> log.debug("Outgoing mover... {}:{}", k, v)
         )
         .to(
-        		TRACE_RAW_TOPIC,
+        		TRACE_UNFILTERED_TOPIC,
         		Produced.with(Serdes.String(), new JsonbSerde<>(Trace.class))
         );
         

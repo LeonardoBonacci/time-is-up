@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.tracktotrace.model;
+package guru.bonacci.timesup.totrace.model;
 
 import javax.json.bind.annotation.JsonbProperty;
 

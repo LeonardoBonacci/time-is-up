@@ -19,9 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 @ApplicationScoped
 public class TopologyProducer {
 
-    private static final String TRACK_TOPIC = "track";
-    private static final String TRACE_RAW_TOPIC = "trace_raw";
-    private static final String TRACE_TOPIC = "trace";
+    static final String TRACK_TOPIC = "track";
+    static final String TRACE_UNFILTERED_TOPIC = "trace-unfiltered";
+    static final String TRACE_TOPIC = "trace";
 
     
     @Produces
@@ -35,7 +35,7 @@ public class TopologyProducer {
 
     	// join a stream of traces with a table of tracks to filter out...
 		builder.stream(                                                       
-                TRACE_RAW_TOPIC,
+                TRACE_UNFILTERED_TOPIC,
                 Consumed.with(Serdes.String(), new JsonbSerde<>(Trace.class))
         )
         .peek(
