@@ -26,7 +26,7 @@ public class UnmovedResource {
 	@Inject @Channel("unmoved-channel") Emitter<Unmoved> emitter;
 	@Inject @Channel("unmoved-data-stream") Publisher<Unmoved> asStream; 
 
-	@POST //http POST localhost:8080/unmoved < src/main/resources/payload.json
+	@POST //http POST localhost:9090/unmoved < src/main/resources/payload.json
 	@Consumes(MediaType.APPLICATION_JSON)
     public void add(@Valid Unmoved unmoved) {
 		log.info("add unmoved {}", unmoved);

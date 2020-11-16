@@ -12,7 +12,7 @@ public class MoverTrackGeoJoiner implements ValueJoiner<Mover, TrackGeo, Trace> 
 		return Trace.builder()
 				.moverId(trackGeo.moverId)
 				.trackingNumber(trackGeo.trackingNumber)
-				.unmovedId("..")
+				.unmovedId(trackGeo.unmovedId)
 				.unmovedGeohash("..")
 				.unmovedLat(trackGeo.unmovedLat)
 				.unmovedLon(trackGeo.unmovedLon)

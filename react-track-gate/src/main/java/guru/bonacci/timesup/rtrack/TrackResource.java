@@ -22,7 +22,7 @@ public class TrackResource {
 
 	@Inject @Channel("track-channel") Emitter<Track> emitter;
 	
-	@POST //http POST localhost:8080/track < src/main/resources/payload.json
+	@POST //http POST localhost:9091/track < src/main/resources/payload.json
 	@Consumes(MediaType.APPLICATION_JSON)
     public void add(@Valid Track track) {
 		log.info("add track {}", track);

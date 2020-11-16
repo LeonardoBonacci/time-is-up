@@ -18,7 +18,7 @@ public class MoverResource {
 
 	@Inject @Channel("mover-channel") Emitter<Mover> emitter;
 	
-	@POST //http POST localhost:8080/mover < src/main/resources/payload.json
+	@POST //http POST localhost:9093/mover < src/main/resources/payload.json
 	@Consumes(MediaType.APPLICATION_JSON)
     public void add(@Valid Mover mover) {
 		emitter.send(KafkaRecord.of(mover.id, mover));
