@@ -5,9 +5,11 @@ import javax.json.bind.annotation.JsonbProperty;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+@Getter
 @Builder
 @ToString
 @NoArgsConstructor
