@@ -55,6 +55,11 @@
 			<artifactId>quarkus-resteasy-jsonb</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.github.davidmoten</groupId>
+			<artifactId>geo</artifactId>
+			<version>0.7.7</version>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.16</version>

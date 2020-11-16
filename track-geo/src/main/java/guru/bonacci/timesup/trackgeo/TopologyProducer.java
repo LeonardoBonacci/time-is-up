@@ -9,6 +9,7 @@ import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.GlobalKTable;
 import org.apache.kafka.streams.kstream.Produced;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import guru.bonacci.timesup.trackgeo.joiners.TrackUnmovedJoiner;
 import guru.bonacci.timesup.trackgeo.model.Track;
@@ -21,10 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 @ApplicationScoped
 public class TopologyProducer {
 
-    static final String UNMOVED_TOPIC = "unmoved";
+	static final String UNMOVED_TOPIC = "unmoved";
     static final String TRACK_TOPIC = "track";
     static final String TRACK_GEO_TOPIC = "track-geo";
 
+    
+    @ConfigProperty(name = "geohash.length", defaultValue = "8") 
+    Integer geoHashLength;
+    
     
     @Produces
     public Topology buildTopology() {
@@ -46,7 +51,7 @@ public class TopologyProducer {
         .join(                                                        
         		unmovedTable,
                 (trackId, track) -> track.unmovedId,
-                new TrackUnmovedJoiner()
+                new TrackUnmovedJoiner(geoHashLength)
         )
         .selectKey(
         		(trackId, track) -> track.moverId
