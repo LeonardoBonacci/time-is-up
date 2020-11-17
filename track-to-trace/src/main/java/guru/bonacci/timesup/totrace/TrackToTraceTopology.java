@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
-public class TopologyProducer {
+public class TrackToTraceTopology {
 
     static final String TRACK_GEO_TOPIC = "track-geo";
     static final String MOVER_TOPIC = "mover";
@@ -57,7 +57,7 @@ public class TopologyProducer {
         .join(                                                        
         		trackGeoStream,
         		new MoverTrackGeoJoiner(),
-                JoinWindows.of(Duration.ofHours(1)).after(Duration.ZERO), // movers < 1 hour after tracks
+                JoinWindows.of(Duration.ofDays(1)).after(Duration.ZERO), // track is tracked for 1 day
                 StreamJoined.with(Serdes.String(), new JsonbSerde<>(Mover.class), new JsonbSerde<>(TrackGeo.class)) 
         )
         .peek(

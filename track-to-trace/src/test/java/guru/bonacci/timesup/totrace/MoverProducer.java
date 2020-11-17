@@ -48,7 +48,7 @@ public class MoverProducer {
 			String key = record.getId();
 
 			log.info("sending trace {}", record);
-			producer.send(new ProducerRecord<>(TopologyProducer.MOVER_TOPIC, key, record), new Callback() {
+			producer.send(new ProducerRecord<>(TrackToTraceTopology.MOVER_TOPIC, key, record), new Callback() {
 				@Override
 				public void onCompletion(RecordMetadata m, Exception e) {
 					if (e != null) {

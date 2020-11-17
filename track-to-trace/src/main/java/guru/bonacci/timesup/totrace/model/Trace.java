@@ -18,6 +18,9 @@ import lombok.ToString;
 public class Trace {
 
 	@JsonbProperty("mover_id") public String moverId;
+	@JsonbProperty("mover_geohash") public String moverGeohash;
+	@JsonbProperty("mover_lat") public double moverLat;
+	@JsonbProperty("mover_lon") public double moverLon;
 	@JsonbProperty("tracking_number") public String trackingNumber;
 	@JsonbProperty("unmoved_id") public String unmovedId;
 	@JsonbProperty("unmoved_geohash") public String unmovedGeohash;

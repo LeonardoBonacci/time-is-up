@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
-public class TopologyProducer {
+public class TraceFilterTopology {
 
     static final String TRACK_TOPIC = "track";
     static final String TRACE_UNFILTERED_TOPIC = "trace-unfiltered";

@@ -51,7 +51,7 @@ public class TrackGeoProducer {
 			String key = record.getTrackingNumber();
 
 			log.info("sending trace {}", record);
-			producer.send(new ProducerRecord<>(TopologyProducer.TRACK_GEO_TOPIC, key, record), new Callback() {
+			producer.send(new ProducerRecord<>(TrackToTraceTopology.TRACK_GEO_TOPIC, key, record), new Callback() {
 				@Override
 				public void onCompletion(RecordMetadata m, Exception e) {
 					if (e != null) {

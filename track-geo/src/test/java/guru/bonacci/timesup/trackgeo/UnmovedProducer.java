@@ -10,7 +10,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-import guru.bonacci.timesup.trackgeo.TopologyProducer;
+import guru.bonacci.timesup.trackgeo.TrackGeoTopology;
 import guru.bonacci.timesup.trackgeo.model.Unmoved;
 import io.quarkus.kafka.client.serialization.JsonbSerializer;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ public class UnmovedProducer {
 			String key = record.getId();
 
 			log.info("sending trace {}", record);
-			producer.send(new ProducerRecord<>(TopologyProducer.UNMOVED_TOPIC, key, record), new Callback() {
+			producer.send(new ProducerRecord<>(TrackGeoTopology.UNMOVED_TOPIC, key, record), new Callback() {
 				@Override
 				public void onCompletion(RecordMetadata m, Exception e) {
 					if (e != null) {

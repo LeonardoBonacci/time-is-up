@@ -51,7 +51,7 @@ public class TraceProducer {
 			String key = record.getMoverId();
 
 			log.info("sending trace {}", record);
-			producer.send(new ProducerRecord<>(TopologyProducer.TRACE_UNFILTERED_TOPIC, key, record), new Callback() {
+			producer.send(new ProducerRecord<>(TraceFilterTopology.TRACE_UNFILTERED_TOPIC, key, record), new Callback() {
 				@Override
 				public void onCompletion(RecordMetadata m, Exception e) {
 					if (e != null) {

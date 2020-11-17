@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
-public class TopologyProducer {
+public class TrackGeoTopology {
 
 	static final String UNMOVED_TOPIC = "unmoved";
     static final String TRACK_TOPIC = "track";

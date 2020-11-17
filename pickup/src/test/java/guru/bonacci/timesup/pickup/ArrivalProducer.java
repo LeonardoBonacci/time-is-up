@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.tracefilter;
+package guru.bonacci.timesup.pickup;
 
 import java.util.Properties;
 
@@ -10,21 +10,22 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-import guru.bonacci.timesup.tracefilter.model.Track;
+import guru.bonacci.timesup.pickup.PickupTopology;
+import guru.bonacci.timesup.pickup.model.Arrival;
 import io.quarkus.kafka.client.serialization.JsonbSerializer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TrackProducer {
+public class ArrivalProducer {
 
-	Producer<String, Track> producer;
+	Producer<String, Arrival> producer;
 
 	public static void main(final String[] args) {
-		TrackProducer traceProducer = new TrackProducer();
+		ArrivalProducer traceProducer = new ArrivalProducer();
 		traceProducer.send();
 	}
 
-	public TrackProducer() {
+	public ArrivalProducer() {
 		producer = new KafkaProducer<>(configure());
 	}
 
@@ -33,22 +34,21 @@ public class TrackProducer {
 		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonbSerializer.class.getName());
-		props.put(ProducerConfig.CLIENT_ID_CONFIG, "i-produce-traces-on-demand");
+		props.put(ProducerConfig.CLIENT_ID_CONFIG, "i-produce-arrivals-on-demand");
 		return props;
 	}
 
 	void send() {
 		for (int i=0; i<5; i++) {
-			Track record = Track.builder()
-					.moverId("mover" + i)
-					.trackingNumber("tracking number" + i)
-					.unmovedId("unmoved " + i)
+			Arrival record = Arrival.builder()
+					.moverId("movers-" + i)
+					.unmovedId("unmoved-" + i)
 					.build();
 
-			String key = record.getTrackingNumber();
+			String key = record.moverId;
 
 			log.info("sending trace {}", record);
-			producer.send(new ProducerRecord<>(TraceFilterTopology.TRACK_TOPIC, key, record), new Callback() {
+			producer.send(new ProducerRecord<>(PickupTopology.ARRIVAL_TOPIC, key, record), new Callback() {
 				@Override
 				public void onCompletion(RecordMetadata m, Exception e) {
 					if (e != null) {

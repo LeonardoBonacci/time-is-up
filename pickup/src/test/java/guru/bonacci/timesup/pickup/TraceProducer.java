@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.tracefilter;
+package guru.bonacci.timesup.pickup;
 
 import java.util.Properties;
 
@@ -10,21 +10,21 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-import guru.bonacci.timesup.tracefilter.model.Track;
+import guru.bonacci.timesup.pickup.model.Trace;
 import io.quarkus.kafka.client.serialization.JsonbSerializer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TrackProducer {
+public class TraceProducer {
 
-	Producer<String, Track> producer;
+	Producer<String, Trace> producer;
 
 	public static void main(final String[] args) {
-		TrackProducer traceProducer = new TrackProducer();
+		TraceProducer traceProducer = new TraceProducer();
 		traceProducer.send();
 	}
 
-	public TrackProducer() {
+	public TraceProducer() {
 		producer = new KafkaProducer<>(configure());
 	}
 
@@ -38,17 +38,23 @@ public class TrackProducer {
 	}
 
 	void send() {
-		for (int i=0; i<5; i++) {
-			Track record = Track.builder()
-					.moverId("mover" + i)
-					.trackingNumber("tracking number" + i)
-					.unmovedId("unmoved " + i)
+		for (int i=0; i<10; i++) {
+			Trace record = Trace.builder()
+					.moverId("movers-" + i)
+					.moverGeohash("hhhhaaassshh")
+					.moverLat(12.34)
+					.moverLon(44.44)
+					.trackingNumber("tracking numberss" + i)
+					.unmovedGeohash("xxx")
+					.unmovedId("unmoved" + i)
+					.unmovedLat(98.65)
+					.unmovedLon(98.65)
 					.build();
 
-			String key = record.getTrackingNumber();
+			String key = record.moverId;
 
 			log.info("sending trace {}", record);
-			producer.send(new ProducerRecord<>(TraceFilterTopology.TRACK_TOPIC, key, record), new Callback() {
+			producer.send(new ProducerRecord<>(PickupTopology.TRACE_TOPIC, key, record), new Callback() {
 				@Override
 				public void onCompletion(RecordMetadata m, Exception e) {
 					if (e != null) {
