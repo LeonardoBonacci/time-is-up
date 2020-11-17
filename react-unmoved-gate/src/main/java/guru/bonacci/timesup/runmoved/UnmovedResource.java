@@ -16,6 +16,7 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.reactivestreams.Publisher;
 
 import guru.bonacci.timesup.runmoved.model.Unmoved;
+import io.smallrye.mutiny.Multi;
 import io.smallrye.reactive.messaging.kafka.KafkaRecord;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UnmovedResource {
 
 	@Inject @Channel("unmoved-channel") Emitter<Unmoved> emitter;
-	@Inject @Channel("unmoved-data-stream") Publisher<Unmoved> asStream; 
+	@Inject @Channel("unmoved-data-stream") Multi<Unmoved> asStream; 
 
 	@POST //http POST localhost:9090/unmoved < src/main/resources/payload.json
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -33,17 +34,26 @@ public class UnmovedResource {
 		emitter.send(KafkaRecord.of(unmoved.id, unmoved));
 	}
 	
-	@DELETE //http DELETE localhost:8080/unmoved/{id}
+	@DELETE //http DELETE localhost:9090/unmoved/{id}
 	@Path("/{id}")
     public void remove(@PathParam(value = "id") String id) {
 		log.info("remove unmoved {}", id);
 		emitter.send(KafkaRecord.of(id, null));
 	}
 
-	@GET //http --stream -f localhost:8080/unmoved/stream
+	
+	
+	@GET //http --stream -f localhost:9090/unmoved/stream
     @Path("/stream")
     @Produces(MediaType.SERVER_SENT_EVENTS) 
     public Publisher<Unmoved> stream() { 
-        return asStream;
-    }
+		return asStream;
+	}
+	
+	@GET //http --stream -f localhost:9090/unmoved/stream2
+    @Path("/stream2")
+    @Produces(MediaType.SERVER_SENT_EVENTS) 
+    public Publisher<Unmoved> stream2() { 
+		return asStream.filter(r -> true);
+	}
 }

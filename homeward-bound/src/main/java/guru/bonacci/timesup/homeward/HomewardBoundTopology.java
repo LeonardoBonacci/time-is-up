@@ -51,6 +51,9 @@ public class HomewardBoundTopology {
     		new TraceAverageJoiner(),
     		Joined.with(Serdes.String(), new JsonbSerde<>(Trace.class), Serdes.Long())
         )
+        .selectKey(
+        	(k,v) -> v.unmovedId
+        )
         .peek(
     		(k,v) -> log.info("Outgoing homeward... {}:{}", k, v)
         )
