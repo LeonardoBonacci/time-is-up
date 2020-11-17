@@ -17,8 +17,8 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.StreamJoined;
 
 import guru.bonacci.timesup.pickup.joiners.TraceArrivalJoiner;
-import guru.bonacci.timesup.pickup.model.AvgAggregation;
 import guru.bonacci.timesup.pickup.model.Arrival;
+import guru.bonacci.timesup.pickup.model.AvgAggregation;
 import guru.bonacci.timesup.pickup.model.TimedArrival;
 import guru.bonacci.timesup.pickup.model.TimedTrace;
 import guru.bonacci.timesup.pickup.model.Trace;
@@ -32,15 +32,13 @@ public class PickupTopology {
 
     static final String TRACE_TOPIC = "trace";
     static final String ARRIVAL_TOPIC = "arrival";
-    static final String AVERAGER_TOPIC = "averager";
+    static final String AVERAGER_TOPIC = "geohash-averager";
 
     
     @Produces
     public Topology buildTopology() {
     	final StreamsBuilder builder = new StreamsBuilder();
 
-    	 JsonbSerde<AvgAggregation> avgAggrSerde = new JsonbSerde<>(AvgAggregation.class);
-    	 
         final KStream<String, TimedArrival> arrivalStream = builder.stream(                                                       
             ARRIVAL_TOPIC,
             Consumed.with(Serdes.String(), new JsonbSerde<>(Arrival.class))
@@ -79,15 +77,17 @@ public class PickupTopology {
         .aggregate(                                                   
             AvgAggregation::new,
             (stationId, value, aggregation) -> aggregation.updateFrom(value),
-            Materialized.with(Serdes.String(), avgAggrSerde)
+            Materialized.with(Serdes.String(), new JsonbSerde<>(AvgAggregation.class))
         )
         .toStream()
         .peek(
     		(k,v) -> log.info("Averages... {}:{}", k, v)
         )
+        .mapValues(
+        	AvgAggregation::getAvg)
         .to(
         	AVERAGER_TOPIC, 
-        	Produced.with(Serdes.String(), avgAggrSerde)
+        	Produced.with(Serdes.String(), Serdes.Long())
         );
         
         return builder.build();
