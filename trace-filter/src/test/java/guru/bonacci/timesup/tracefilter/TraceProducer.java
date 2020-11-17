@@ -48,7 +48,7 @@ public class TraceProducer {
 					.unmovedLon(56.78)
 					.build();
 
-			String key = record.getMoverId();
+			String key = record.moverId;
 
 			log.info("sending trace {}", record);
 			producer.send(new ProducerRecord<>(TraceFilterTopology.TRACE_UNFILTERED_TOPIC, key, record), new Callback() {

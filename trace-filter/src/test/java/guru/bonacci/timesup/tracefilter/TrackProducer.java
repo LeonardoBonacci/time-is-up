@@ -45,7 +45,7 @@ public class TrackProducer {
 					.unmovedId("unmoved " + i)
 					.build();
 
-			String key = record.getTrackingNumber();
+			String key = record.trackingNumber;
 
 			log.info("sending trace {}", record);
 			producer.send(new ProducerRecord<>(TraceFilterTopology.TRACK_TOPIC, key, record), new Callback() {

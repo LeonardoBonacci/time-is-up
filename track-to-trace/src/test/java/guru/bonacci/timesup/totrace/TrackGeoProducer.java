@@ -48,7 +48,7 @@ public class TrackGeoProducer {
 					.unmovedLon(98.65)
 					.build();
 
-			String key = record.getTrackingNumber();
+			String key = record.trackingNumber;
 
 			log.info("sending trace {}", record);
 			producer.send(new ProducerRecord<>(TrackToTraceTopology.TRACK_GEO_TOPIC, key, record), new Callback() {

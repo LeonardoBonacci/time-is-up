@@ -45,7 +45,7 @@ public class MoverProducer {
 					.lon(56.789)
 					.build();
 
-			String key = record.getId();
+			String key = record.id;
 
 			log.info("sending trace {}", record);
 			producer.send(new ProducerRecord<>(TrackToTraceTopology.MOVER_TOPIC, key, record), new Callback() {

@@ -46,7 +46,7 @@ public class UnmovedProducer {
 					.lon(56.78)
 					.build();
 
-			String key = record.getId();
+			String key = record.id;
 
 			log.info("sending trace {}", record);
 			producer.send(new ProducerRecord<>(TrackGeoTopology.UNMOVED_TOPIC, key, record), new Callback() {
