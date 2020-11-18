@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.jboss.resteasy.annotations.SseElementType;
 import org.reactivestreams.Publisher;
 
 import guru.bonacci.timesup.runmoved.model.Unmoved;
@@ -41,19 +42,11 @@ public class UnmovedResource {
 		emitter.send(KafkaRecord.of(id, null));
 	}
 
-	
-	
 	@GET //http --stream -f localhost:9090/unmoved/stream
-    @Path("/stream")
+    @Path("/stream/{unmovedId}")
+	@SseElementType(MediaType.APPLICATION_JSON) 
     @Produces(MediaType.SERVER_SENT_EVENTS) 
-    public Publisher<Unmoved> stream() { 
-		return asStream;
-	}
-	
-	@GET //http --stream -f localhost:9090/unmoved/stream2
-    @Path("/stream2")
-    @Produces(MediaType.SERVER_SENT_EVENTS) 
-    public Publisher<Unmoved> stream2() { 
-		return asStream.filter(r -> true);
+    public Publisher<Unmoved> stream(@PathParam(value = "unmovedId") String unmovedId) { 
+		return asStream.filter(unmoved -> unmovedId.equals(unmoved.id));
 	}
 }
