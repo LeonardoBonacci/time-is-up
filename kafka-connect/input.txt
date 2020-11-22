@@ -1,0 +1,37 @@
+mvn clean package -Pnative -Dquarkus.profile=kube -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
+docker build -f src/main/docker/Dockerfile.native -t leonardobonacci/react-unmoved-gate .
+docker push leonardobonacci/react-unmoved-gate
+
+SETHOOK arrivals kafka://my-cluster-kafka-bootstrap:9092/arrival-raw NEARBY trace FENCE ROAM unmoved * 100
+
+echo "{\"id\":\"foo\",\"lat\":1.0,\"lon\":1.0}" | kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-console-producer.sh --broker-list localhost:9092 --topic unmoved
+
+echo "{\"mover_id\":\"bar6\",\"mover_lat\":1.0,\"mover_lon\":1.0}" | kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-console-producer.sh --broker-list localhost:9092 --topic trace
+
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+    --from-beginning --property print.key=true \
+    --topic unmoved
+
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-topics.sh --list --bootstrap-server localhost:9092 
+
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-topics.sh --describe \
+    --bootstrap-server localhost:9092 \
+    --topic trace 
+
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-configs.sh --describe \
+    --bootstrap-server localhost:9092 \
+    --entity-type topics \
+    --entity-name trace 
+
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-configs.sh --alter \
+    --bootstrap-server localhost:9092 \
+    --entity-type topics \
+    --entity-name arrival-raw \
+    --add-config message.timestamp.type=LogAppendTime

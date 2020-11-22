@@ -1,0 +1,42 @@
+kubectl run --image=tutum/curl -it --restart=Never --rm client-pod
+kubectl port-forward kubia 8080
+
+kubectl config set-context --current --namespace=default
+kubectl config view --minify | grep namespace:
+
+kubectl exec --stdin --tty reload-example-9887644d8-kjs9l -- /bin/bash
+
+alias k='kubectl'
+
+# create a new namespace
+k create namespace timesup && k config set-context --current --namespace=timesup
+
+# deploy Strimzi operator
+curl -L https://github.com/strimzi/strimzi-kafka-operator/releases/download/0.18.0/strimzi-cluster-operator-0.18.0.yaml \
+    | sed "s/namespace: .*/namespace: kafka/g" | k apply -f -
+
+k get crds -l app=strimzi
+
+# deploy Kafka cluster
+k apply -f  kafka-ephemeral-single.yaml -n kafka
+
+docker build -t leonardobonacci/my-connect:3.0 .
+docker login
+docker push leonardobonacci/my-connect:3.0
+
+# deploy Kafka connect cluster
+k apply -f kafka-connect/my-connect.yaml -n kafka
+
+
+echo "{\"foo\":\"bar3\"}" | kubectl exec -i my-cluster-kafka-0 -c kafka --     bin/kafka-console-producer.sh --broker-list localhost:9092 --topic my-topic9
+kubectl exec -i my-cluster-kafka-0 -c kafka --     bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic my-topic4 --from-beginning
+
+kubectl exec -i pod/my-connect-connect-9cb4d49c4-z4tqm   --     curl localhost:8083/connectors
+
+k port-forward service/es 9200
+
+https://developers.redhat.com/blog/2019/05/20/subsecond-deployment-and-startup-of-apache-camel-applications/
+
+kubectl create secret generic my-test-secret \
+  --from-literal=pw=ANBCD
+

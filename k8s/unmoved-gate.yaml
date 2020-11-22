@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: unmoved-gate
+spec:
+  selector:
+    app: unmoved-gate
+  ports:
+    - name: unmoved-gate
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unmoved-gate
+  labels:
+    app: unmoved-gate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unmoved-gate
+  template:
+    metadata:
+      labels:
+        app: unmoved-gate
+    spec:
+      containers:
+      - name: unmoved-gate
+        image: leonardobonacci/react-unmoved-gate
+        ports:
+        - containerPort: 8080

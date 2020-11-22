@@ -1,0 +1,22 @@
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaConnector
+metadata:
+  name: tile-sink
+  labels:
+    # must match connect cluster name
+    strimzi.io/cluster: my-connect
+spec:
+  tasksMax: 1
+  class: guru.bonacci.kafka.connect.tile38.Tile38SinkConnector
+  config:
+    name: tile-sink
+    topics: 'unmoved,trace'
+
+    key.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter.schemas.enable: false
+
+    tile38.topic.unmoved: 'SET unmoved event.id POINT event.lat event.lon'
+    tile38.topic.trace: 'SET trace event.mover_id POINT event.mover_lat event.mover_lon'
+    tile38.host: tile38
+    tile38.port: 9851
