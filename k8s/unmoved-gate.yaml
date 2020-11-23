@@ -30,4 +30,13 @@ spec:
       - name: unmoved-gate
         image: leonardobonacci/react-unmoved-gate
         ports:
-        - containerPort: 8080
+        - name: http
+          containerPort: 8080
+        startupProbe:
+          httpGet:
+            path: /health/ready
+            port: http
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: http

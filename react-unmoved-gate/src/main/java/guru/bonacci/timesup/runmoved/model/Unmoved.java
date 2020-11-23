@@ -20,9 +20,9 @@ public class Unmoved {
 	@NotBlank(message = "*id*")
 	public String id;
 
-	@Range(min = -90, max = 90, message = "Where the lat are you?")
+	@Range(min = -90, max = 90, message = "Where on earth is your lat?")
 	public double lat;
 
-	@Range(min = -180, max = 80, message = "Where the lon are you?")
+	@Range(min = -180, max = 80, message = "Where on earth is your lon?")
 	public double lon;
 }
