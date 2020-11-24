@@ -15,6 +15,6 @@ public class Alive implements HealthCheck {
 
     @Override
     public HealthCheckResponse call() {
-		return HealthCheckResponse.down("Failing health check");
+    	return health.check();
     }
 }

@@ -7,6 +7,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
@@ -21,6 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 public class UnmovedResource {
 
 	@Inject @Channel("unmoved-channel") Emitter<Unmoved> emitter;
+
+	@POST
+	@Path("/echo")
+    @Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+    public String echo(String requestBody) throws Exception {
+        return requestBody;
+    }
 
 	@POST //http POST localhost:9090/unmoved < src/main/resources/payload.json
 	@Consumes(MediaType.APPLICATION_JSON)
