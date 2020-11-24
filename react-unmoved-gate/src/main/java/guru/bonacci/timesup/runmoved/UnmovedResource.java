@@ -23,6 +23,7 @@ public class UnmovedResource {
 
 	@Inject @Channel("unmoved-channel") Emitter<Unmoved> emitter;
 
+
 	@POST
 	@Path("/echo")
     @Produces(MediaType.APPLICATION_JSON)
