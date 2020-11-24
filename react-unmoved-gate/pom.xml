@@ -22,8 +22,8 @@
 			<artifactId>quarkus-hibernate-validator</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>com.google.guava</groupId>
-		    <artifactId>guava</artifactId>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
 		</dependency>
 	</dependencies>
 

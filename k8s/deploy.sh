@@ -40,9 +40,11 @@ kubectl wait --for=condition=ready pod my-cluster-zookeeper-0 --timeout=90s
 kubectl wait --for=condition=ready pod my-cluster-kafka-0 --timeout=90s
 
 --------------------
-kubectl apply -f rbac.yaml
-
-kubectl -n $NAMESPACE create configmap shared-config --from-literal kafka.bootstrap.servers=my-cluster-kafka-bootstrap:9092
-
+kubectl -n $NAMESPACE create configmap kafka-config --from-literal kafka.bootstrap.servers=my-cluster-kafka-bootstrap:9092
 kubectl apply -f topics.yaml
-kubectl apply -f unmoved-gate.yaml
+
+--------------------
+mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.push=true
+mvn clean package -Dquarkus.container-image.push=true
+kubectl apply -f target/kubernetes/kubernetes.yml
+#2020-11-24 23:44:03,650 INFO  [io.quarkus] (main) react-unmoved-gate 1.0-SNAPSHOT native (powered by Quarkus 1.9.2.Final) started in 0.027s. Listening on: http://0.0.0.0:8080
