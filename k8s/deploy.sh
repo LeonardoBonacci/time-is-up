@@ -39,5 +39,10 @@ kubectl apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operato
 kubectl wait --for=condition=ready pod my-cluster-zookeeper-0 --timeout=90s
 kubectl wait --for=condition=ready pod my-cluster-kafka-0 --timeout=90s
 
+--------------------
+kubectl apply -f rbac.yaml
+
+kubectl -n $NAMESPACE create configmap shared-config --from-literal kafka.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+
 kubectl apply -f topics.yaml
 kubectl apply -f unmoved-gate.yaml

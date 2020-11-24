@@ -1,3 +1,18 @@
+mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
+docker build -f src/main/docker/Dockerfile.native -t leonardobonacci/react-unmoved-gate .
+
+mvn clean package 
+docker build -f src/main/docker/Dockerfile.jvm -t leonardobonacci/react-unmoved-gate .
+
+
+docker push leonardobonacci/react-unmoved-gate
+
+
+
+kubectl port-forward tile38 9851
+SETHOOK arrivals kafka://my-cluster-kafka-bootstrap:9092/arrival-raw NEARBY trace FENCE ROAM unmoved * 100
+
+
 kubectl run --image=tutum/curl -it --restart=Never --rm client-pod
 kubectl port-forward kubia 8080
 
