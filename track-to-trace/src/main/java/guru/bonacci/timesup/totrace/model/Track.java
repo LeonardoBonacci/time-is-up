@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.tracefilter.model;
+package guru.bonacci.timesup.totrace.model;
 
 import javax.json.bind.annotation.JsonbProperty;
 
@@ -15,8 +15,8 @@ import lombok.ToString;
 @RegisterForReflection 
 public class Track {
 
-	@JsonbProperty("tracking_number") public String trackingNumber;
 	@JsonbProperty("mover_id") public String moverId;
+	@JsonbProperty("tracking_number") public String trackingNumber;
 	@JsonbProperty("unmoved_id") public String unmovedId;
 	@JsonbProperty("unmoved_geohash") public String unmovedGeohash;
 	@JsonbProperty("unmoved_lat") public double unmovedLat;

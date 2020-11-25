@@ -49,7 +49,7 @@ public class InteractiveQueries {
     }
 
     public HomewardDataResult getData(String unmovedId) {
-        KeyQueryMetadata metadata = streams.queryMetadataForKey(
+        var metadata = streams.queryMetadataForKey(
                 HomeTopology.HOME_STORE,
                 unmovedId,
                 Serdes.String().serializer()

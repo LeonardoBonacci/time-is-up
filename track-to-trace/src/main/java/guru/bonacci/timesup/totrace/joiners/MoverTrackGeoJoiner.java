@@ -7,11 +7,11 @@ import com.github.davidmoten.geo.GeoHash;
 
 import guru.bonacci.timesup.totrace.model.Mover;
 import guru.bonacci.timesup.totrace.model.Trace;
-import guru.bonacci.timesup.totrace.model.TrackGeo;
+import guru.bonacci.timesup.totrace.model.Track;
 
-public class MoverTrackGeoJoiner implements ValueJoiner<Mover, TrackGeo, Trace> {
+public class MoverTrackGeoJoiner implements ValueJoiner<Mover, Track, Trace> {
 
-	public Trace apply(Mover mover, TrackGeo trackGeo) {
+	public Trace apply(Mover mover, Track trackGeo) {
 		return Trace.builder()
 				.moverId(trackGeo.moverId)
 				.moverGeohash(geoHashLength(mover.lat, mover.lat, trackGeo.unmovedLat, trackGeo.unmovedLon))

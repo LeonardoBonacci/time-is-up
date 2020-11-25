@@ -33,7 +33,6 @@
 		<module>react-track-gate</module>
 		<module>react-unmoved-gate</module>
 		<module>trace-filter</module>
-		<module>track-geo</module>
 		<module>track-to-trace</module>
 	</modules>
 

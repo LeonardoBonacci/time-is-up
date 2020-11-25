@@ -24,6 +24,7 @@ public class UnmovedResource {
 
 	@Inject @Channel("unmoved-channel") Emitter<Unmoved> emitter;
 
+	
 	@POST //http POST localhost:30000/unmoved < src/main/resources/payload.json
 	@Consumes(APPLICATION_JSON)
     public void add(@Valid Unmoved unmoved) {

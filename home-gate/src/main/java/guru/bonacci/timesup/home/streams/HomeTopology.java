@@ -30,7 +30,7 @@ public class HomeTopology {
     
     @Produces
     public Topology buildTopology() {
-    	final StreamsBuilder builder = new StreamsBuilder();
+    	final var builder = new StreamsBuilder();
 
     	JsonbSerde<Homeward> homewardSerde = new JsonbSerde<>(Homeward.class);
     	
