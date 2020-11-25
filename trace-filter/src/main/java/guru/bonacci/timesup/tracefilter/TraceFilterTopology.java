@@ -28,23 +28,25 @@ public class TraceFilterTopology {
     public Topology buildTopology() {
     	final StreamsBuilder builder = new StreamsBuilder();
 
-    	// a table of tracks
     	final GlobalKTable<String, Track> trackTable = builder.globalTable(
                 TRACK_TOPIC,
                 Consumed.with(Serdes.String(), new JsonbSerde<>(Track.class)));
 
-    	// join a stream of traces with a table of tracks to filter out...
+    	// join a stream of traces with a table of tracks to filter out traces of deleted tracks
 		builder.stream(                                                       
                 TRACE_UNFILTERED_TOPIC,
                 Consumed.with(Serdes.String(), new JsonbSerde<>(Trace.class))
         )
         .peek(
-        		(k,v) -> log.debug("Incoming trace... {}:{}", k, v)
+        		(k,v) -> log.info("Incoming... {}:{}", k, v)
         )
         .join(                                                        
         		trackTable,
                 (traceId, trace) -> trace.trackingNumber,
                 (trace, track) -> trace
+        )
+        .peek(
+        		(k,v) -> log.info("Outgoing... {}:{}", k, v)
         )
         .to(
         		TRACE_TOPIC,

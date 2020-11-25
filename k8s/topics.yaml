@@ -67,3 +67,13 @@ metadata:
 spec:
   replicas: 1
   partitions: 2
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaTopic
+metadata:
+  name: test
+  labels:
+      strimzi.io/cluster: my-cluster
+spec:
+  replicas: 1
+  partitions: 2
