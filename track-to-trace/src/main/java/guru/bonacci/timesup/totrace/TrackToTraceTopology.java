@@ -43,25 +43,25 @@ public class TrackToTraceTopology {
         		(k,v) -> v.moverId, Named.as("track-geo-by-moverid")
 		)
         .peek(
-        		(k,v) -> log.info("Incoming track geo... {}:{}", k, v)
+        		(k,v) -> log.info("Incoming... {}:{}", k, v)
         );
 
-        // join a stream of movers with a table of track-geo's to create traces
+        // join a stream of movers with a stream of track-geo's to create traces
         builder.stream(                                                       
                 MOVER_TOPIC,
                 Consumed.with(Serdes.String(), new JsonbSerde<>(Mover.class))
         )
         .peek(
-        		(k,v) -> log.info("Incoming mover... {}:{}", k, v)
+        		(k,v) -> log.info("Incoming... {}:{}", k, v)
         )
         .join(                                                        
         		trackGeoStream,
         		new MoverTrackGeoJoiner(),
-                JoinWindows.of(Duration.ofDays(1)).after(Duration.ZERO), // track is tracked for 1 day
+                JoinWindows.of(Duration.ofDays(1)).after(Duration.ZERO), // tracked for 1 day only
                 StreamJoined.with(Serdes.String(), new JsonbSerde<>(Mover.class), new JsonbSerde<>(TrackGeo.class)) 
         )
         .peek(
-        		(k,v) -> log.info("Outgoing mover... {}:{}", k, v)
+        		(k,v) -> log.info("Outgoing... {}:{}", k, v)
         )
         .to(
         		TRACE_UNFILTERED_TOPIC,

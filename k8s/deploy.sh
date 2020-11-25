@@ -40,7 +40,8 @@ kubectl wait --for=condition=ready pod my-cluster-zookeeper-0 --timeout=90s
 kubectl wait --for=condition=ready pod my-cluster-kafka-0 --timeout=90s
 
 --------------------
-kubectl -n $NAMESPACE create configmap kafka-config --from-literal kafka.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+kubectl -n $NAMESPACE create configmap kafka-config --from-literal=kafka.bootstrap.servers=my-cluster-kafka-bootstrap:9092 --from-literal=quarkus.kafka-streams.bootstrap-servers=my-cluster-kafka-bootstrap:9092
+
 kubectl apply -f topics.yaml
 
 --------------------

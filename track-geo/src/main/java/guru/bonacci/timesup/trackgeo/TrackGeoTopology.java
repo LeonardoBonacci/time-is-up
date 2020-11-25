@@ -46,7 +46,7 @@ public class TrackGeoTopology {
                 Consumed.with(Serdes.String(), new JsonbSerde<>(Track.class))
         )
         .peek(
-        		(k,v) -> log.info("Incoming track... {}:{}", k, v)
+        		(k,v) -> log.info("Incoming... {}:{}", k, v)
         )
         .join(                                                        
         		unmovedTable,
@@ -57,10 +57,10 @@ public class TrackGeoTopology {
         		(trackId, track) -> track.moverId
         )
         .peek(
-        		(k,v) -> log.info("Outgoing track... {}:{}", k, v)
+        		(k,v) -> log.info("Outgoing... {}:{}", k, v)
         )
         .to(
-        		TRACK_GEO_TOPIC, //TODO compacted topic                                                      
+        		TRACK_GEO_TOPIC,
                 Produced.with(Serdes.String(), new JsonbSerde<>(TrackGeo.class))
         );
         
