@@ -17,9 +17,9 @@ import io.smallrye.mutiny.Multi;
 @Path("/home")
 public class HomeResource {
 
-	@Inject @Channel("homeward-bound-stream") Multi<Homeward> homewardStream; 
+	@Inject @Channel("homeward-stream") Multi<Homeward> homewardStream; 
 
-	@GET //http --stream -f localhost:9094/home/stream
+	@GET //http --stream -f localhost:30003/home/stream/nowhere
     @Path("/stream/{unmovedId}")
 	@SseElementType(MediaType.APPLICATION_JSON) 
     @Produces(MediaType.SERVER_SENT_EVENTS) 

@@ -23,7 +23,7 @@ public class HomewardBoundTopology {
 
     static final String TRACE_TOPIC = "trace";
     static final String AVERAGER_TOPIC = "geohash-averager";
-    static final String HOMEWARD_TOPIC = "homeward-bound";
+    static final String HOMEWARD_TOPIC = "homeward";
 
     
     @Produces
@@ -44,7 +44,7 @@ public class HomewardBoundTopology {
         	(k,v) -> v.moverGeohash + "/" + v.unmovedGeohash
         )
         .peek(
-    		(k,v) -> log.info("Incoming trace... {}:{}", k, v)
+    		(k,v) -> log.info("Incoming... {}:{}", k, v)
         )
         .leftJoin(                                                        
     		averageTable,
@@ -55,7 +55,7 @@ public class HomewardBoundTopology {
         	(k,v) -> v.unmovedId
         )
         .peek(
-    		(k,v) -> log.info("Outgoing homeward... {}:{}", k, v)
+    		(k,v) -> log.info("Outgoing... {}:{}", k, v)
         )
         .to(
         	HOMEWARD_TOPIC, 

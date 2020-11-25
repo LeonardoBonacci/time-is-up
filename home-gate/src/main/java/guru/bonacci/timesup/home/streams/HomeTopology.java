@@ -25,7 +25,7 @@ public class HomeTopology {
 
 	static final String HOME_STORE = "home-store";
     
-	static final String HOMEWARD_TOPIC = "homeward-bound";
+	static final String HOMEWARD_TOPIC = "homeward";
 
     
     @Produces
