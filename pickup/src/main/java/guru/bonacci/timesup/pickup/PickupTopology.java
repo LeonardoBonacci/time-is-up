@@ -30,8 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @ApplicationScoped
 public class PickupTopology {
 
-    static final String TRACE_TOPIC = "trace";
     static final String ARRIVAL_TOPIC = "arrival";
+    static final String TRACE_TOPIC = "trace";
     static final String AVERAGER_TOPIC = "geohash-averager";
 
     
@@ -44,10 +44,10 @@ public class PickupTopology {
             Consumed.with(Serdes.String(), new JsonbSerde<>(Arrival.class))
         )
         .transformValues(
-    		() -> new ArrivalEventTimeEnricher() // extracts rowtime to payload
+    		() -> new ArrivalEventTimeEnricher() // copies rowtime to payload
         )
         .peek(
-    		(k,v) -> log.info("Incoming arrival... {}:{}", k, v)
+    		(k,v) -> log.info("Incoming... {}:{}", k, v)
         );
 
         // join a stream of traces with a stream of last hour arrivals
@@ -56,10 +56,10 @@ public class PickupTopology {
             Consumed.with(Serdes.String(), new JsonbSerde<>(Trace.class))
         )
         .transformValues(
-    		() -> new TraceEventTimeEnricher() // extracts rowtime to payload
+    		() -> new TraceEventTimeEnricher() // copies rowtime to payload
         )
         .peek(
-    		(k,v) -> log.info("Incoming trace... {}:{}", k, v)
+    		(k,v) -> log.info("Incoming... {}:{}", k, v)
         )
         .join(                                                        
     		arrivalStream,

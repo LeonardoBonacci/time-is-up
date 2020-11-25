@@ -43,6 +43,13 @@ kubectl wait --for=condition=ready pod my-cluster-kafka-0 --timeout=90s
 kubectl -n $NAMESPACE create configmap kafka-config --from-literal=kafka.bootstrap.servers=my-cluster-kafka-bootstrap:9092 --from-literal=quarkus.kafka-streams.bootstrap-servers=my-cluster-kafka-bootstrap:9092
 
 kubectl apply -f topics.yaml
+kubectl apply -f tile38.yaml
+kubectl apply -f kafka-connect/connect-cluster.yaml
+kubectl apply -f kafka-connect/tile-sink-connector.yaml
+
+kubectl port-forward tile38 9851 #bash not installed on the pod :(
+SETHOOK arrivals kafka://my-cluster-kafka-bootstrap:9092/arrival-raw NEARBY trace FENCE ROAM unmoved * 1000
+
 
 --------------------
 mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.push=true

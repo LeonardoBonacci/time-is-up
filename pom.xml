@@ -24,6 +24,7 @@
 	</properties>
 
 	<modules>
+		<module>arrival-cooker</module>
 		<module>home-gate</module>
 		<module>homeward-bound</module>
 		<module>pickup</module>

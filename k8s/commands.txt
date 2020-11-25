@@ -8,7 +8,13 @@ echo "{\"mover_id\":\"bar6\",\"mover_lat\":1.0,\"mover_lon\":1.0}" | kubectl exe
 kubectl exec -i my-cluster-kafka-0 -c kafka -- \
     bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
     --from-beginning --property print.key=true \
-    --topic trace
+    --topic arrival-raw
+
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+    --from-beginning --property print.key=true \
+    --value-deserializer org.apache.kafka.common.serialization.LongDeserializer \
+    --topic geohash-averager
 
 kubectl exec -i my-cluster-kafka-0 -c kafka -- \
     bin/kafka-topics.sh --list --bootstrap-server localhost:9092 
@@ -16,7 +22,7 @@ kubectl exec -i my-cluster-kafka-0 -c kafka -- \
 kubectl exec -i my-cluster-kafka-0 -c kafka -- \
     bin/kafka-topics.sh --describe \
     --bootstrap-server localhost:9092 \
-    --topic trace 
+    --topic arrival-raw
 
 kubectl exec -i my-cluster-kafka-0 -c kafka -- \
     bin/kafka-configs.sh --describe \

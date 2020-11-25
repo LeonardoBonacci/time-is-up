@@ -1,21 +1,20 @@
 package guru.bonacci.timesup.pickup.model;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@ToString(callSuper = true)
+@Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @RegisterForReflection 
-public class TimedArrival extends Arrival {
+public class Arrival {
 
-	public TimedArrival(Arrival arrival, long rowtime) {
-		this.moverId = arrival.moverId;
-		this.unmovedId = arrival.unmovedId;
-        this.rowtime = rowtime;
-	}
-	
-	public long rowtime;
+	@JsonbProperty("mover_id") public String moverId;
+	@JsonbProperty("unmoved_id") public String unmovedId;
 }

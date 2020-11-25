@@ -3,7 +3,9 @@ package guru.bonacci.timesup.pickup.model;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+@ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @RegisterForReflection 
