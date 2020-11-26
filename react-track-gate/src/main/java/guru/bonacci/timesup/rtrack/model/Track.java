@@ -24,6 +24,7 @@ public class Track {
 	@JsonbProperty("unmoved_id")
 	public String unmovedId;
 	
+	// the following fields are added before sending the track to the broker
 	@JsonbProperty("unmoved_geohash") public String unmovedGeohash;
 	@JsonbProperty("unmoved_lat") public double unmovedLat;
 	@JsonbProperty("unmoved_lon") public double unmovedLon;

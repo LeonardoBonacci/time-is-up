@@ -63,7 +63,9 @@ public class TrackResource {
 		if (unmoved != null) {
 			log.info("enrich track with {}", unmoved);
 			emitter.send(KafkaRecord.of(track.trackingNumber, track.enrich(unmoved, geoHashLength)));
-			return Response.ok(track.trackingNumber).build();
+			var resp = new TrackResponse(track.trackingNumber, track.unmovedLat, track.unmovedLon);
+			log.info("response {}", resp);
+			return Response.ok(resp).build();
 		} else {
 			var warning = "No unmoved found for id " + track.unmovedId;
 			log.warn(warning);

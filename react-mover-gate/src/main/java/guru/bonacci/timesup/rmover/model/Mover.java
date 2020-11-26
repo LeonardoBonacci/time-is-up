@@ -17,6 +17,6 @@ public class Mover {
 	@Range(min = -90, max = 90, message = "Where the lat are you?")
 	public double lat;
     
-	@Range(min = -180, max = 80, message = "Where the lon are you?")
+	@Range(min = -180, max = 180, message = "Where the lon are you?")
 	public double lon;
 }

@@ -56,7 +56,7 @@ kubectl apply -f tile38.yaml
 kubectl apply -f kafka-connect/tile-sink-connector.yaml
 
 kubectl port-forward tile38 9851 #bash not installed on the pod :(
-SETHOOK arrivals kafka://my-cluster-kafka-bootstrap:9092/arrival-raw NEARBY trace FENCE ROAM unmoved * 1000
+SETHOOK arrivals kafka://my-cluster-kafka-bootstrap:9092/arrival-raw NEARBY trace FENCE ROAM unmoved * 100
 
 
 --------------------
@@ -67,6 +67,7 @@ mvn clean package -Dquarkus.container-image.build=true
 
 kind load docker-image leonardobonacci/timesup-react-unmoved-gate:4.2
 kubectl apply -f react-unmoved-gate/target/kubernetes/kubernetes.yml
+kubectl apply -f target/kubernetes/kubernetes.yml
 #2020-11-24 23:44:03,650 INFO  [io.quarkus] (main) react-unmoved-gate 1.0-SNAPSHOT native (powered by Quarkus 1.9.2.Final) started in 0.027s. Listening on: http://0.0.0.0:8080
 docker exec -it kind-control-plane crictl images
 
