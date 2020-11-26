@@ -1,3 +1,12 @@
+./kafka-console-consumer \
+     --bootstrap-server localhost:32100 \
+     --topic unmoved \
+     --key-deserializer org.apache.kafka.common.serialization.StringDeserializer \
+     --value-deserializer org.apache.kafka.connect.json.JsonDeserializer \
+     --from-beginning \
+     --property print.key=true
+
+
 kubectl run kafka-producer -ti --image=quay.io/strimzi/kafka:latest-kafka-2.6.0 --rm=true --restart=Never -- bin/kafka-console-producer.sh --broker-list cluster-name-kafka-bootstrap:9092 --topic my-topic
 kubectl run kafka-consumer -ti --image=quay.io/strimzi/kafka:latest-kafka-2.6.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server cluster-name-kafka-bootstrap:9092 --topic my-topic --from-beginning
 

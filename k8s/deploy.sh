@@ -18,6 +18,10 @@ nodes:
     hostPort: 32100
   - containerPort: 32000
     hostPort: 32000
+  - containerPort: 32001
+    hostPort: 32001
+  - containerPort: 32002
+    hostPort: 32002
 EOF
 
 NAMESPACE="kafka"
@@ -34,8 +38,8 @@ kubectl wait --for=condition=ready pod -l name=strimzi-cluster-operator --timeou
 
 # deploy Kafka cluster
 #kubectl apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/release-${STRIMZI_VER/%.0/.x}/examples/kafka/kafka-persistent-single.yaml
-#https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/2ab51a232b38a88ee434486788adbe33187f350b/examples/kafka/kafka-persistent-single.yaml
-kubectl apply -f kafka-persistent-single.yaml
+#https://github.com/strimzi/strimzi-kafka-operator/tree/master/examples/kafka
+kubectl apply -f kafka-persistent.yaml
 
 # and wait a while
 kubectl wait --for=condition=ready pod my-cluster-zookeeper-0 --timeout=90s
@@ -55,10 +59,16 @@ SETHOOK arrivals kafka://my-cluster-kafka-bootstrap:9092/arrival-raw NEARBY trac
 
 --------------------
 mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.push=true
+mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
 mvn clean package -Dquarkus.container-image.push=true
-kubectl apply -f target/kubernetes/kubernetes.yml
-#2020-11-24 23:44:03,650 INFO  [io.quarkus] (main) react-unmoved-gate 1.0-SNAPSHOT native (powered by Quarkus 1.9.2.Final) started in 0.027s. Listening on: http://0.0.0.0:8080
+mvn clean package -Dquarkus.container-image.build=true
 
-kubectl get service my-cluster-kafka-external-bootstrap -o=jsonpath='{.spec.ports[0].nodePort}{"\n"}' # 30092
+kind load docker-image leonardobonacci/timesup-react-unmoved-gate:4.2
+kubectl apply -f react-unmoved-gate/target/kubernetes/kubernetes.yml
+#2020-11-24 23:44:03,650 INFO  [io.quarkus] (main) react-unmoved-gate 1.0-SNAPSHOT native (powered by Quarkus 1.9.2.Final) started in 0.027s. Listening on: http://0.0.0.0:8080
+docker exec -it kind-control-plane crictl images
+
+
+kubectl get service my-cluster-kafka-external-bootstrap -o=jsonpath='{.spec.ports[0].nodePort}{"\n"}' # 32100
 kubectl get node kind-control-plane -o=jsonpath='{range .status.addresses[*]}{.type}{"\t"}{.address}{"\n"}' # 172.18.0.2
 kubectl exec my-cluster-kafka-0 -c kafka -it -- cat /tmp/strimzi.properties | grep advertised
