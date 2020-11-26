@@ -16,10 +16,8 @@ nodes:
     hostPort: 30004
   - containerPort: 32100
     hostPort: 32100
-    listenAddress: "127.0.0.1"
   - containerPort: 32000
     hostPort: 32000
-    listenAddress: "127.0.0.1"
 EOF
 
 NAMESPACE="kafka"
