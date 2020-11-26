@@ -2,6 +2,8 @@ package guru.bonacci.timesup.rtrack;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import java.util.UUID;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -60,8 +62,11 @@ public class TrackResource {
 
 		var unmoved = unmovedStore.get(track.unmovedId);
 		
+		if (track.trackingNumber == null || track.trackingNumber.isBlank()) {
+			track.trackingNumber = UUID.randomUUID().toString();
+		}
+			
 		if (unmoved != null) {
-			log.info("enrich track with {}", unmoved);
 			emitter.send(KafkaRecord.of(track.trackingNumber, track.enrich(unmoved, geoHashLength)));
 			var resp = new TrackResponse(track.trackingNumber, track.unmovedLat, track.unmovedLon);
 			log.info("response {}", resp);
@@ -71,7 +76,6 @@ public class TrackResource {
 			log.warn(warning);
 			return Response.status(Status.GONE.getStatusCode(), warning).build();
 		}
-
 	}
 
 	@DELETE // http DELETE localhost:30001/track/{id}

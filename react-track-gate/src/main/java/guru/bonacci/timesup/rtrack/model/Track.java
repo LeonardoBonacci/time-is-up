@@ -12,7 +12,6 @@ import lombok.ToString;
 @RegisterForReflection 
 public class Track {
 
-	@NotBlank(message = "*t*a*k*n*_*u*b*r*")
 	@JsonbProperty("tracking_number")
     public String trackingNumber;
 

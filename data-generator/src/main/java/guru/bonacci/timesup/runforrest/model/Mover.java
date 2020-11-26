@@ -1,5 +1,8 @@
 package guru.bonacci.timesup.runforrest.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.LatLngTool.Bearing;
@@ -25,10 +28,10 @@ public class Mover {
 	public Mover step(int stepSizeMeters) {
 		LatLng start = new LatLng(this.lat, this.lon);
 		LatLng dest = LatLngTool.travel(start, Bearing.EAST, stepSizeMeters, LengthUnit.METER);
-		log.info("mover {} travels from {} to {} ", this.id, start, dest);
+		log.info("mover '{}' travels from {} to {} ", this.id, start, dest);
 
-		this.lat = dest.getLatitude();
-		this.lon = dest.getLongitude();
+		this.lat = new BigDecimal(dest.getLatitude()).setScale(5, RoundingMode.HALF_UP).doubleValue();
+		this.lon = new BigDecimal(dest.getLongitude()).setScale(5, RoundingMode.HALF_UP).doubleValue();
 		return this;
 	}
 }
