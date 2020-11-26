@@ -22,6 +22,8 @@ nodes:
     hostPort: 32001
   - containerPort: 32002
     hostPort: 32002
+- role: worker
+- role: worker
 EOF
 
 NAMESPACE="kafka"
@@ -39,7 +41,7 @@ kubectl wait --for=condition=ready pod -l name=strimzi-cluster-operator --timeou
 # deploy Kafka cluster
 #kubectl apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/release-${STRIMZI_VER/%.0/.x}/examples/kafka/kafka-persistent-single.yaml
 #https://github.com/strimzi/strimzi-kafka-operator/tree/master/examples/kafka
-kubectl apply -f kafka-persistent.yaml
+kubectl apply -f k8s/kafka-persistent.yaml
 
 # and wait a while
 kubectl wait --for=condition=ready pod my-cluster-zookeeper-0 --timeout=90s
