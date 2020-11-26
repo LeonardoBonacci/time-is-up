@@ -1,5 +1,3 @@
-#!/bin/bash
-
 cat <<EOF | kind create cluster --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -8,19 +6,23 @@ nodes:
   extraPortMappings:
   - containerPort: 30000
     hostPort: 30000
-    protocol: TCP
   - containerPort: 30001
     hostPort: 30001
-    protocol: TCP
   - containerPort: 30002
     hostPort: 30002
-    protocol: TCP
   - containerPort: 30003
     hostPort: 30003
-    protocol: TCP
+  - containerPort: 30004
+    hostPort: 30004
+  - containerPort: 32100
+    hostPort: 32100
+    listenAddress: "127.0.0.1"
+  - containerPort: 32000
+    hostPort: 32000
+    listenAddress: "127.0.0.1"
 EOF
 
-NAMESPACE="demo"
+NAMESPACE="kafka"
 STRIMZI_VER="0.20.0"
 
 # create a new namespace
@@ -33,18 +35,20 @@ curl -L https://github.com/strimzi/strimzi-kafka-operator/releases/download/$STR
 kubectl wait --for=condition=ready pod -l name=strimzi-cluster-operator --timeout=-1s
 
 # deploy Kafka cluster
-kubectl apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/release-${STRIMZI_VER/%.0/.x}/examples/kafka/kafka-persistent-single.yaml
+#kubectl apply -f https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/release-${STRIMZI_VER/%.0/.x}/examples/kafka/kafka-persistent-single.yaml
+#https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/2ab51a232b38a88ee434486788adbe33187f350b/examples/kafka/kafka-persistent-single.yaml
+kubectl apply -f kafka-persistent-single.yaml
 
 # and wait a while
 kubectl wait --for=condition=ready pod my-cluster-zookeeper-0 --timeout=90s
 kubectl wait --for=condition=ready pod my-cluster-kafka-0 --timeout=90s
 
---------------------
-kubectl -n $NAMESPACE create configmap kafka-config --from-literal=kafka.bootstrap.servers=my-cluster-kafka-bootstrap:9092 --from-literal=quarkus.kafka-streams.bootstrap-servers=my-cluster-kafka-bootstrap:9092
+kubectl -n kafka apply -f topics.yaml
+kubectl -n kafka apply -f kafka-connect/connect-cluster.yaml
 
-kubectl apply -f topics.yaml
+--------------------
+kubectl create configmap kafka-config --from-literal=kafka.bootstrap.servers=my-cluster-kafka-bootstrap:9092 --from-literal=quarkus.kafka-streams.bootstrap-servers=my-cluster-kafka-bootstrap:9092
 kubectl apply -f tile38.yaml
-kubectl apply -f kafka-connect/connect-cluster.yaml
 kubectl apply -f kafka-connect/tile-sink-connector.yaml
 
 kubectl port-forward tile38 9851 #bash not installed on the pod :(
@@ -56,3 +60,7 @@ mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.conta
 mvn clean package -Dquarkus.container-image.push=true
 kubectl apply -f target/kubernetes/kubernetes.yml
 #2020-11-24 23:44:03,650 INFO  [io.quarkus] (main) react-unmoved-gate 1.0-SNAPSHOT native (powered by Quarkus 1.9.2.Final) started in 0.027s. Listening on: http://0.0.0.0:8080
+
+kubectl get service my-cluster-kafka-external-bootstrap -o=jsonpath='{.spec.ports[0].nodePort}{"\n"}' # 30092
+kubectl get node kind-control-plane -o=jsonpath='{range .status.addresses[*]}{.type}{"\t"}{.address}{"\n"}' # 172.18.0.2
+kubectl exec my-cluster-kafka-0 -c kafka -it -- cat /tmp/strimzi.properties | grep advertised

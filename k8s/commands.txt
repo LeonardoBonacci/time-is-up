@@ -1,3 +1,6 @@
+kubectl run kafka-producer -ti --image=quay.io/strimzi/kafka:latest-kafka-2.6.0 --rm=true --restart=Never -- bin/kafka-console-producer.sh --broker-list cluster-name-kafka-bootstrap:9092 --topic my-topic
+kubectl run kafka-consumer -ti --image=quay.io/strimzi/kafka:latest-kafka-2.6.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server cluster-name-kafka-bootstrap:9092 --topic my-topic --from-beginning
+
 
 echo "{\"id\":\"foo\",\"lat\":1.0,\"lon\":1.0}" | kubectl exec -i my-cluster-kafka-0 -c kafka -- \
     bin/kafka-console-producer.sh --broker-list localhost:9092 --topic unmoved
@@ -8,7 +11,7 @@ echo "{\"mover_id\":\"bar6\",\"mover_lat\":1.0,\"mover_lon\":1.0}" | kubectl exe
 kubectl exec -i my-cluster-kafka-0 -c kafka -- \
     bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
     --from-beginning --property print.key=true \
-    --topic track
+    --topic unmoved
 
 kubectl exec -i my-cluster-kafka-0 -c kafka -- \
     bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
