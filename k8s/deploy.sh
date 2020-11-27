@@ -62,7 +62,7 @@ SETHOOK arrivals kafka://my-cluster-kafka-bootstrap:9092/arrival-raw NEARBY trac
 
 --------------------
 mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.push=true
-mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
+mvn clean package -Dquarkus.profile=docker-registry -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
 mvn clean package -Dquarkus.container-image.push=true
 mvn clean package -Dquarkus.container-image.build=true
 

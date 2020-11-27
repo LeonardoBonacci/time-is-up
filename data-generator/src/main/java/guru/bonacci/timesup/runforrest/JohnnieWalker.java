@@ -51,6 +51,7 @@ public class JohnnieWalker {
 
 		mover.step(stepSizeMeters);
 		if (mover.lon <= finalLon) {
+			log.info("from {} to {}", mover.lon, finalLon);
 			moverService.send(mover);
 		} else {
 			mover.lon = finalLon;

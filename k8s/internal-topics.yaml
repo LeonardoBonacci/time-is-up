@@ -1,0 +1,12 @@
+#some flaky behaviour causes this sometimes
+#Exception in thread "react-the-track-cf9933db-2b5e-46ec-b066-ad6585f754e0-StreamThread-1" org.apache.kafka.streams.errors.StreamsException: Existing internal topic react-the-track-unmoved-store-changelog has invalid partitions: expected: 4; actual: 1. Use 'kafka.tools.StreamsResetter' tool to clean up invalid topics before processing.
+#        at org.apache.kafka.streams.processor.internals.InternalTopicManager.validateTopics(InternalTopicManager.java:237)
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaTopic
+metadata:
+  name: react-the-track-unmoved-store-changelog
+  labels:
+      strimzi.io/cluster: my-cluster
+spec:
+  replicas: 1
+  partitions: 4

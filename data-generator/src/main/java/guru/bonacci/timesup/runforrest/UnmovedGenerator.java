@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
-public class ValuesGenerator {
+public class UnmovedGenerator {
 
 	static final String STORE_T7 = "Torpedo7";
 	static final String STORE_WH = "Warehouse";
