@@ -26,15 +26,15 @@ public class JohnnieWalker {
 
 	
 	void walk(String moverId, LatLng end, RunConfig config) {
-		double unmovedLon = end.getLongitude();
+		var unmovedLon = end.getLongitude();
 		log.info("trying to reach {}", unmovedLon);
 
-		LatLng start = LatLngTool.travel(end, Bearing.WEST, config.distanceMeters, LengthUnit.METER);
-		double stepSizeMeters = config.speedKmHr * 1000 / 3600;
+		var start = LatLngTool.travel(end, Bearing.WEST, config.distanceMeters, LengthUnit.METER);
+		var stepSizeMeters = config.speedKmHr * 1000 / 3600;
 		
 		log.info("stepsize meters per sec {}", stepSizeMeters);
 
-		int stepSizeMetersAcc = (int)stepSizeMeters * ACCELERATION_FACTOR;
+		var stepSizeMetersAcc = (int)stepSizeMeters * ACCELERATION_FACTOR;
 		//to satisfy the impatient demo audience we move a bit faster..
 		log.info("accelerate to {}", stepSizeMetersAcc);
 

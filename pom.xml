@@ -25,6 +25,7 @@
 
 	<modules>
 		<module>arrival-cooker</module>
+		<module>cleanser</module>
 		<module>data-generator</module>
 		<module>home-gate</module>
 		<module>homeward-bound</module>

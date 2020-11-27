@@ -12,7 +12,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.javadocmd.simplelatlng.LatLng;
 
-import guru.bonacci.timesup.runforrest.client.TrackResponse;
 import guru.bonacci.timesup.runforrest.client.TrackService;
 import guru.bonacci.timesup.runforrest.model.RunConfig;
 import guru.bonacci.timesup.runforrest.model.Track;
@@ -42,7 +41,7 @@ public class RunForrestResource {
     				@PathParam("trackingNumber") String trackingNumber, 
     				RunConfig runConfig) {
 		log.info("run {} - {} - {} : {}", unmovedId, moverId, trackingNumber, runConfig); 
-		TrackResponse trackResp = trackService.send(new Track(trackingNumber, moverId, unmovedId));
+		var trackResp = trackService.send(new Track(trackingNumber, moverId, unmovedId));
 
 		executor.runAsync(() -> {
 			executor.execute(() -> 

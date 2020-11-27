@@ -52,6 +52,7 @@ kubectl -n kafka apply -f kafka-connect/connect-cluster.yaml
 
 --------------------
 kubectl create configmap kafka-config --from-literal=kafka.bootstrap.servers=my-cluster-kafka-bootstrap:9092 --from-literal=quarkus.kafka-streams.bootstrap-servers=my-cluster-kafka-bootstrap:9092
+
 kubectl apply -f tile38.yaml
 kubectl apply -f kafka-connect/tile-sink-connector.yaml
 

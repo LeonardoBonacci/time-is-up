@@ -4,14 +4,13 @@
 	xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>guru.bonacci.timesup.cleanse</groupId>
-	<artifactId>cleanser</artifactId>
 	<parent>
-		<groupId>guru.bonacci.timesup</groupId>
-		<artifactId>parent</artifactId>
-		<version>1.0-SNAPSHOT</version>
-		<relativePath>../</relativePath>
+	    <groupId>guru.bonacci.timesup</groupId>
+	    <artifactId>time-is-up</artifactId>
+	    <version>1.0-SNAPSHOT</version>
+	    <relativePath>../</relativePath>
 	</parent>
+	<artifactId>cleanser</artifactId>
 
 	<dependencies>
 		  <dependency>
@@ -22,9 +21,5 @@
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-kafka-streams</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-resteasy-jackson</artifactId>
-        </dependency>
 	</dependencies>
 </project>

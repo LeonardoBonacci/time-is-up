@@ -7,11 +7,11 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-@RegisterRestClient
 @Path("track")
+@RegisterRestClient
 public interface TrackEndpoint {
 
 	@DELETE
-	@Path("/{nr}/delay/{delay}")
-	Response tombstone(@PathParam("nr") String trackingNumber, @PathParam("delay") int ms);
+	@Path("/{trackingNumber}")
+	Response tombstone(@PathParam("trackingNumber") String trackingNumber);
 }
