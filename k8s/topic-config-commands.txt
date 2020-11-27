@@ -1,0 +1,26 @@
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-configs.sh --describe \
+    --bootstrap-server localhost:9092 \
+    --entity-type topics \
+    --entity-name track
+
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-configs.sh --alter \
+    --bootstrap-server localhost:9092 \
+    --entity-type topics \
+    --entity-name arrival-raw \
+    --add-config message.timestamp.type=LogAppendTime
+
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-configs.sh --alter \
+    --bootstrap-server localhost:9092 \
+    --entity-type topics \
+    --entity-name track \
+    --add-config cleanup.policy=[compact,delete] 
+
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-configs.sh --alter \
+    --bootstrap-server localhost:9092 \
+    --entity-type topics \
+    --entity-name track \
+    --add-config delete.retention.ms=900000 
