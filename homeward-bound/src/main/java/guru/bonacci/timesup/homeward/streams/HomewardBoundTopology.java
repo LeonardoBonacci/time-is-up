@@ -52,7 +52,7 @@ public class HomewardBoundTopology {
     		Joined.with(Serdes.String(), new JsonbSerde<>(Trace.class), Serdes.Long())
         )
         .selectKey(
-        	(k,v) -> v.unmovedId
+        	(k,v) -> v.moverId
         )
         .peek(
     		(k,v) -> log.info("Outgoing... {}:{}", k, v)

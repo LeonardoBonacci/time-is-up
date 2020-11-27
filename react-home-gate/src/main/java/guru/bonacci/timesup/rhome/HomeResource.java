@@ -19,7 +19,7 @@ public class HomeResource {
 
 	@Inject @Channel("homeward-stream") Multi<Homeward> homewardStream; 
 
-	@GET //http --stream -f localhost:30003/home/stream/nowhere
+	@GET //http --stream -f localhost:30003/home/stream/Warehouse
     @Path("/stream/{unmovedId}")
 	@SseElementType(MediaType.APPLICATION_JSON) 
     @Produces(MediaType.SERVER_SENT_EVENTS) 

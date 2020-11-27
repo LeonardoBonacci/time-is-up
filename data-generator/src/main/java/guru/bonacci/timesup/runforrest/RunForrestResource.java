@@ -27,11 +27,11 @@ public class RunForrestResource {
 	@Inject JohnnieWalker johhnie;
 
 	/**
-		http POST localhost:8080/runforrest/me/Torpedo7/bike < src/main/resources/payload1.json
-		http POST localhost:8080/runforrest/you/Warehouse/box < src/main/resources/payload20.json
 		http POST localhost:8080/runforrest/him/NaturallyOrganic/coffee1 < src/main/resources/payload5.json
 		http POST localhost:8080/runforrest/her/NaturallyOrganic/coffee2 < src/main/resources/payload10.json
 		http POST localhost:8080/runforrest/us/Torpedo7/trampoline < src/main/resources/payload15.json
+		http POST localhost:8080/runforrest/you/Warehouse/box < src/main/resources/payload20.json
+	  	http POST localhost:8080/runforrest/them/WarehouseStationary/pencil < src/main/resources/payload5.json
 	*/
 	@POST 
 	@Path("/{moverId}/{unmovedId}/{trackingNumber}")

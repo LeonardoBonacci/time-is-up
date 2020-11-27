@@ -39,18 +39,17 @@ public class CleanserPipeline {
 	@Inject @RestClient TrackEndpoint track;
 	
 	private KafkaStreams streams;
-	
-	@ConfigProperty(name = "quarkus.kafka-streams.topics")
-	String topic;
 
-	@ConfigProperty(name = "app.name")
-	String appId;
+	@ConfigProperty(name = "quarkus.kafka-streams.bootstrap-servers") String bootstrapServers;
+	@ConfigProperty(name = "quarkus.kafka-streams.topics") String topic;
+	@ConfigProperty(name = "app.name", defaultValue = "cleanser-app") String appId;
 
 	
     void onStart(@Observes StartupEvent event) {
     	var props = new Properties();
+	    props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 	    props.put(StreamsConfig.APPLICATION_ID_CONFIG, appId);
-		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
 		var builder = new StreamsBuilder();
 

@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.totrace.model;
+package guru.bonacci.timesup.tracktrace.model;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.AllArgsConstructor;

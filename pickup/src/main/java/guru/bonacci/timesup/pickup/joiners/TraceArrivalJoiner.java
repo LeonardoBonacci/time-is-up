@@ -19,7 +19,7 @@ public class TraceArrivalJoiner implements ValueJoiner<TimedTrace, TimedArrival,
 				.unmovedLat(trace.unmovedLat)
 				.unmovedLon(trace.unmovedLon)
 				.unmovedGeohash(trace.unmovedGeohash)
-				.togoMs(arrival.rowtime = trace.rowtime)
+				.togoMs(arrival.rowtime - trace.rowtime)
 				.build();
 	}
 }

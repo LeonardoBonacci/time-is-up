@@ -29,10 +29,8 @@ EOF
 NAMESPACE="kafka"
 STRIMZI_VER="0.20.0"
 
-# create a new namespace
 kubectl create namespace $NAMESPACE && kubectl config set-context --current --namespace=$NAMESPACE
 
-# deploy Strimzi operator
 curl -L https://github.com/strimzi/strimzi-kafka-operator/releases/download/$STRIMZI_VER/strimzi-cluster-operator-$STRIMZI_VER.yaml \
     | sed "s/namespace: .*/namespace: $NAMESPACE/g" | kubectl apply -f -
 
@@ -44,29 +42,36 @@ kubectl wait --for=condition=ready pod -l name=strimzi-cluster-operator --timeou
 kubectl apply -f k8s/kafka-persistent.yaml
 
 # and wait a while
-kubectl wait --for=condition=ready pod my-cluster-zookeeper-0 --timeout=90s
-kubectl wait --for=condition=ready pod my-cluster-kafka-0 --timeout=90s
+kubectl wait --for=condition=ready pod my-cluster-zookeeper-0 --timeout=120s
+kubectl wait --for=condition=ready pod my-cluster-kafka-0 --timeout=120s
 
-kubectl -n kafka apply -f topics.yaml
-kubectl -n kafka apply -f kafka-connect/connect-cluster.yaml
+kubectl -n $NAMESPACE apply -f k8s/kafka-connect/connect-cluster.yaml
+kubectl -n $NAMESPACE apply -f k8s/topics.yaml
+kubectl -n $NAMESPACE apply -f k8s/internal-topics.yaml
 
 --------------------
 kubectl create configmap kafka-config --from-literal=kafka.bootstrap.servers=my-cluster-kafka-bootstrap:9092 --from-literal=quarkus.kafka-streams.bootstrap-servers=my-cluster-kafka-bootstrap:9092
 
-kubectl apply -f tile38.yaml
-kubectl apply -f kafka-connect/tile-sink-connector.yaml
+kubectl apply -f k8s/tile38.yaml
+kubectl apply -f k8s/kafka-connect/tile-sink-connector.yaml
 
 kubectl port-forward tile38 9851 #bash not installed on the pod :(
 SETHOOK arrivals kafka://my-cluster-kafka-bootstrap:9092/arrival-raw NEARBY trace FENCE ROAM unmoved * 100
 
+kubectl exec -i my-cluster-kafka-0 -c kafka -- \
+    bin/kafka-configs.sh --alter \
+    --bootstrap-server localhost:9092 \
+    --entity-type topics \
+    --entity-name arrival-raw \
+    --add-config message.timestamp.type=LogAppendTime
 
 --------------------
-mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.push=true
+mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
 mvn clean package -Dquarkus.profile=docker-registry -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
 mvn clean package -Dquarkus.container-image.push=true
 mvn clean package -Dquarkus.container-image.build=true
 
-kind load docker-image leonardobonacci/timesup-react-unmoved-gate:4.2
+kind load docker-image leonardobonacci/timesup-home-gate:4.2
 kubectl apply -f react-unmoved-gate/target/kubernetes/kubernetes.yml
 kubectl apply -f target/kubernetes/kubernetes.yml
 #2020-11-24 23:44:03,650 INFO  [io.quarkus] (main) react-unmoved-gate 1.0-SNAPSHOT native (powered by Quarkus 1.9.2.Final) started in 0.027s. Listening on: http://0.0.0.0:8080

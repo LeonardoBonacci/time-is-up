@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.totrace.streams;
+package guru.bonacci.timesup.tracktrace.streams;
 
 import java.time.Duration;
 
@@ -15,10 +15,10 @@ import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.StreamJoined;
 
-import guru.bonacci.timesup.totrace.joiners.MoverTrackGeoJoiner;
-import guru.bonacci.timesup.totrace.model.Mover;
-import guru.bonacci.timesup.totrace.model.Trace;
-import guru.bonacci.timesup.totrace.model.Track;
+import guru.bonacci.timesup.tracktrace.joiners.MoverTrackGeoJoiner;
+import guru.bonacci.timesup.tracktrace.model.Mover;
+import guru.bonacci.timesup.tracktrace.model.Trace;
+import guru.bonacci.timesup.tracktrace.model.Track;
 import io.quarkus.kafka.client.serialization.JsonbSerde;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,37 +35,37 @@ public class TrackToTraceTopology {
     public Topology buildTopology() {
     	final var builder = new StreamsBuilder();
 
-        final KStream<String, Track> trackGeoStream = builder.stream(                                                       
-                TRACK_TOPIC,
-                Consumed.with(Serdes.String(), new JsonbSerde<>(Track.class))
+        final KStream<String, Track> trackStream = builder.stream(                                                       
+            TRACK_TOPIC,
+            Consumed.with(Serdes.String(), new JsonbSerde<>(Track.class))
         )
         .selectKey(
-        		(k,v) -> v.moverId, Named.as("track-geo-by-moverid")
+    		(k,v) -> v.moverId, Named.as("track-geo-by-moverid")
 		)
         .peek(
-        		(k,v) -> log.info("Incoming... {}:{}", k, v)
+    		(k,v) -> log.info("Incoming... {}:{}", k, v)
         );
 
         // join a stream of movers with a stream of track-geo's to create traces
         builder.stream(                                                       
-                MOVER_TOPIC,
-                Consumed.with(Serdes.String(), new JsonbSerde<>(Mover.class))
+            MOVER_TOPIC,
+            Consumed.with(Serdes.String(), new JsonbSerde<>(Mover.class))
         )
         .peek(
-        		(k,v) -> log.info("Incoming... {}:{}", k, v)
+    		(k,v) -> log.info("Incoming... {}:{}", k, v)
         )
         .join(                                                        
-        		trackGeoStream,
-        		new MoverTrackGeoJoiner(),
-                JoinWindows.of(Duration.ofDays(1)).after(Duration.ZERO), // tracked for 1 day only
-                StreamJoined.with(Serdes.String(), new JsonbSerde<>(Mover.class), new JsonbSerde<>(Track.class)) 
+    		trackStream,
+    		new MoverTrackGeoJoiner(),
+            JoinWindows.of(Duration.ofDays(1)).after(Duration.ZERO), // tracked for 1 day only
+            StreamJoined.with(Serdes.String(), new JsonbSerde<>(Mover.class), new JsonbSerde<>(Track.class)) 
         )
         .peek(
-        		(k,v) -> log.info("Outgoing... {}:{}", k, v)
+    		(k,v) -> log.info("Outgoing... {}:{}", k, v)
         )
         .to(
-        		TRACE_UNFILTERED_TOPIC,
-        		Produced.with(Serdes.String(), new JsonbSerde<>(Trace.class))
+    		TRACE_UNFILTERED_TOPIC,
+    		Produced.with(Serdes.String(), new JsonbSerde<>(Trace.class))
         );
         
         return builder.build();

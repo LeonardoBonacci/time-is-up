@@ -32,7 +32,7 @@ public class ArrivalCookerTopology {
             Consumed.with(Serdes.String(), Serdes.serdeFrom(new JsonSerializer(), new JsonDeserializer()))
         )
 	    .peek(
-	    		(k,v) -> log.info("Incoming... {}:{}", k, v)
+    		(k,v) -> log.info("Incoming... {}:{}", k, v)
         )
         .filter(
         	(k,v) -> v.get(ArrivalRawKeyValueMapper.NEARBY) != null // filters out the faraway messages
@@ -41,7 +41,7 @@ public class ArrivalCookerTopology {
     		new ArrivalRawKeyValueMapper()
     	)
 	    .peek(
-	    		(k,v) -> log.info("Outgoing... {}:{}", k, v)
+    		(k,v) -> log.info("Outgoing... {}:{}", k, v)
         )
         .to(
         	ARRIVAL_TOPIC, 

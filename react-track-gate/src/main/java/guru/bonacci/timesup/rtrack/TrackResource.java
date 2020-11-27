@@ -67,7 +67,8 @@ public class TrackResource {
 		}
 			
 		if (unmoved != null) {
-			emitter.send(KafkaRecord.of(track.trackingNumber, track.enrich(unmoved, geoHashLength)));
+			var trackGeo = track.enrich(unmoved, geoHashLength);
+			emitter.send(KafkaRecord.of(trackGeo.trackingNumber, trackGeo));
 			var resp = new TrackResponse(track.trackingNumber, track.unmovedLat, track.unmovedLon);
 			log.info("response {}", resp);
 			return Response.ok(resp).build();

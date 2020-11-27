@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.totrace.streams;
+package guru.bonacci.timesup.tracktrace.streams;
 
 import java.util.Properties;
 
@@ -10,22 +10,22 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-import guru.bonacci.timesup.totrace.model.Mover;
-import guru.bonacci.timesup.totrace.streams.TrackToTraceTopology;
+import guru.bonacci.timesup.tracktrace.model.Track;
+import guru.bonacci.timesup.tracktrace.streams.TrackToTraceTopology;
 import io.quarkus.kafka.client.serialization.JsonbSerializer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MoverProducer {
+public class TrackProducer {
 
-	Producer<String, Mover> producer;
+	Producer<String, Track> producer;
 
 	public static void main(final String[] args) {
-		MoverProducer traceProducer = new MoverProducer();
+		TrackProducer traceProducer = new TrackProducer();
 		traceProducer.send();
 	}
 
-	public MoverProducer() {
+	public TrackProducer() {
 		producer = new KafkaProducer<>(configure());
 	}
 
@@ -34,22 +34,25 @@ public class MoverProducer {
 		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonbSerializer.class.getName());
-		props.put(ProducerConfig.CLIENT_ID_CONFIG, "i-produce-movers-on-demand");
+		props.put(ProducerConfig.CLIENT_ID_CONFIG, "i-produce-track-geos-on-demand");
 		return props;
 	}
 
 	void send() {
-		for (int i=0; i<10; i++) {
-			Mover record = Mover.builder()
-					.id("mover-" + i)
-					.lat(12.345)
-					.lon(56.789)
+		for (int i=0; i<5; i++) {
+			Track record = Track.builder()
+					.moverId("mover-" + i)
+					.trackingNumber("tracking numberss" + i)
+					.unmovedGeohash("xxx")
+					.unmovedId("unmoved" + i)
+					.unmovedLat(98.65)
+					.unmovedLon(98.65)
 					.build();
 
-			String key = record.id;
+			String key = record.trackingNumber;
 
 			log.info("sending trace {}", record);
-			producer.send(new ProducerRecord<>(TrackToTraceTopology.MOVER_TOPIC, key, record), new Callback() {
+			producer.send(new ProducerRecord<>(TrackToTraceTopology.TRACK_TOPIC, key, record), new Callback() {
 				@Override
 				public void onCompletion(RecordMetadata m, Exception e) {
 					if (e != null) {

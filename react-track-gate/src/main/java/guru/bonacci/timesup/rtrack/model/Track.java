@@ -8,17 +8,20 @@ import com.github.davidmoten.geo.GeoHash;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.ToString;
 
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 @RegisterForReflection 
 public class Track {
 
+	@ToString.Include
 	@JsonbProperty("tracking_number")
     public String trackingNumber;
 
+	@ToString.Include
 	@NotBlank(message = "*m*v*r*id*")
 	@JsonbProperty("mover_id")
 	public String moverId;
 
+	@ToString.Include
 	@NotBlank(message = "*u*m*v*d*id*")
 	@JsonbProperty("unmoved_id")
 	public String unmovedId;
@@ -33,6 +36,7 @@ public class Track {
 		this.unmovedLat = unmoved.lat;
 		this.unmovedLon = unmoved.lon;
 		this.unmovedGeohash = GeoHash.encodeHash(unmoved.lat, unmoved.lon, hashLength);
+		this.trackingNumber = unmoved.id + "--" + this.trackingNumber; 
 		return this;
 	}
 }

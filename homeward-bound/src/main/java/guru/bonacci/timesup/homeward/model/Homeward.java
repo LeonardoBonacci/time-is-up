@@ -15,6 +15,7 @@ import lombok.ToString;
 @RegisterForReflection 
 public class Homeward {
 
+	@JsonbProperty("mover_id") public String moverId;
 	@JsonbProperty("unmoved_id") public String unmovedId;
 	@JsonbProperty("tracking_number") public String trackingNumber;
 	@JsonbProperty("togo_ms") public long togoMs;

@@ -9,6 +9,7 @@ public class TraceAverageJoiner implements ValueJoiner<Trace, Long, Homeward> {
 
 	public Homeward apply(Trace trace, Long average) {
 		return Homeward.builder()
+				.moverId(trace.moverId)
 				.unmovedId(trace.unmovedId)
 				.trackingNumber(trace.trackingNumber)
 				.togoMs(average != null ? average : -1)

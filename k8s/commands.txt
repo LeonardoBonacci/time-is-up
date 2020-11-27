@@ -1,6 +1,6 @@
 ./kafka-console-consumer \
      --bootstrap-server localhost:32100 \
-     --topic unmoved \
+     --topic trace \
      --key-deserializer org.apache.kafka.common.serialization.StringDeserializer \
      --value-deserializer org.apache.kafka.connect.json.JsonDeserializer \
      --from-beginning \
@@ -20,7 +20,7 @@ echo "{\"mover_id\":\"bar6\",\"mover_lat\":1.0,\"mover_lon\":1.0}" | kubectl exe
 kubectl exec -i my-cluster-kafka-0 -c kafka -- \
     bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
     --from-beginning --property print.key=true \
-    --topic track
+    --topic trace
 
 kubectl exec -i my-cluster-kafka-0 -c kafka -- \
     bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \

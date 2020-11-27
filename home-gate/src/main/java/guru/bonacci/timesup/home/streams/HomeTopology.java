@@ -41,11 +41,18 @@ public class HomeTopology {
 								        	 false);
         
 		builder.stream(                                                       
-                HOMEWARD_TOPIC,
-                Consumed.with(Serdes.String(), homewardSerde)
+            HOMEWARD_TOPIC,
+            Consumed.with(Serdes.String(), homewardSerde)
         )
-        .groupByKey(Grouped.with(Serdes.String(), homewardSerde))
-    	.windowedBy(TimeWindows.of(Duration.ofSeconds(30)))
+		.selectKey(
+			(k,v) -> v.unmovedId
+        )
+        .groupByKey(
+    		Grouped.with(Serdes.String(), homewardSerde)
+		)
+    	.windowedBy(
+			TimeWindows.of(Duration.ofSeconds(30))
+		)
         .aggregate(
             Aggregation::new,
             (unmovedId, homeward, aggr) -> aggr.updateFrom(homeward),

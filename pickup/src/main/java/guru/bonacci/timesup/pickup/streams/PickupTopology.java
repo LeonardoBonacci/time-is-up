@@ -32,6 +32,7 @@ public class PickupTopology {
 
     static final String ARRIVAL_TOPIC = "arrival";
     static final String TRACE_TOPIC = "trace";
+    static final String PICKUP_TOPIC = "pickup";
     static final String AVERAGER_TOPIC = "geohash-averager";
 
     
@@ -50,8 +51,7 @@ public class PickupTopology {
     		(k,v) -> log.info("Incoming... {}:{}", k, v)
         );
 
-        // join a stream of traces with a stream of last hour arrivals
-        builder.stream(                                                       
+        final KStream<String, TimedTrace> traceStream = builder.stream(                                                       
             TRACE_TOPIC,
             Consumed.with(Serdes.String(), new JsonbSerde<>(Trace.class))
         )
@@ -60,19 +60,28 @@ public class PickupTopology {
         )
         .peek(
     		(k,v) -> log.info("Incoming... {}:{}", k, v)
-        )
-        .join(                                                        
+        );
+        
+        
+        final var traceArrivalSerde = new JsonbSerde<>(TraceArrival.class);
+        
+        // join a stream of traces with a stream of last hour arrivals
+        traceStream.join(                                                        
     		arrivalStream,
     		new TraceArrivalJoiner(),
-            JoinWindows.of(Duration.ofHours(1)).after(Duration.ZERO), // traces < 1 hour after arrivals
+            JoinWindows.of(Duration.ofHours(1)).before(Duration.ZERO), // traces within 1 hour of arrivals
             StreamJoined.with(Serdes.String(), new JsonbSerde<>(TimedTrace.class), new JsonbSerde<>(TimedArrival.class)) 
         )
         .peek(
-    		(k,v) -> log.info("Outgoing trace... {}:{}", k, v)
+    		(k,v) -> log.info("Outgoing... {}:{}", k, v)
         )
+        .through(
+        	PICKUP_TOPIC,
+        	Produced.with(Serdes.String(), traceArrivalSerde)
+    	)
         .groupBy(
     		(k,v) -> v.moverGeohash + '/' + v.unmovedGeohash,
-    		Grouped.with(Serdes.String(), new JsonbSerde<>(TraceArrival.class))
+    		Grouped.with(Serdes.String(), traceArrivalSerde)
 		)
         .aggregate(                                                   
             AvgAggregation::new,

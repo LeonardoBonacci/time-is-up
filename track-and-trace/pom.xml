@@ -10,7 +10,7 @@
 	    <version>1.0-SNAPSHOT</version>
 	    <relativePath>../</relativePath>
 	</parent>
-	<artifactId>track-to-trace</artifactId>
+	<artifactId>track-and-trace</artifactId>
 
 	<dependencies>
 		<dependency>
