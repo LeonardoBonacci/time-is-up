@@ -18,5 +18,6 @@ spec:
 
     tile38.topic.unmoved: 'SET unmoved event.id POINT event.lat event.lon'
     tile38.topic.trace: 'SET trace event.mover_id POINT event.mover_lat event.mover_lon'
+    tile38.topic.trace.expire: 5
     tile38.host: tile38
     tile38.port: 9851
