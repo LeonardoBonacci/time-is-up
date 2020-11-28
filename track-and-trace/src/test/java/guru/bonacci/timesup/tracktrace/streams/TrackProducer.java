@@ -11,7 +11,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import guru.bonacci.timesup.tracktrace.model.Track;
-import guru.bonacci.timesup.tracktrace.streams.TrackToTraceTopology;
+import guru.bonacci.timesup.tracktrace.streams.TrackAndTraceTopology;
 import io.quarkus.kafka.client.serialization.JsonbSerializer;
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,7 +52,7 @@ public class TrackProducer {
 			String key = record.trackingNumber;
 
 			log.info("sending trace {}", record);
-			producer.send(new ProducerRecord<>(TrackToTraceTopology.TRACK_TOPIC, key, record), new Callback() {
+			producer.send(new ProducerRecord<>(TrackAndTraceTopology.TRACK_TOPIC, key, record), new Callback() {
 				@Override
 				public void onCompletion(RecordMetadata m, Exception e) {
 					if (e != null) {

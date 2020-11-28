@@ -1,5 +1,6 @@
 package guru.bonacci.timesup.cleanse.streams;
 
+import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -23,6 +24,9 @@ import org.eclipse.microprofile.metrics.MetricRegistry;
 import org.eclipse.microprofile.metrics.MetricType;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import guru.bonacci.timesup.cleanse.rest.TrackEndpoint;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
@@ -44,6 +48,14 @@ public class CleanserPipeline {
 	@ConfigProperty(name = "quarkus.kafka-streams.topics") String topic;
 	@ConfigProperty(name = "app.name", defaultValue = "cleanser-app") String appId;
 
+	// While only needing a plain Set we use Guave's cache for its expiration functionality
+	private final Cache<String, String> processedTracks;
+
+	public CleanserPipeline() {
+		processedTracks = CacheBuilder.newBuilder()
+			    .expireAfterWrite(Duration.ofMinutes(2))
+			    .build();
+	}
 	
     void onStart(@Observes StartupEvent event) {
     	var props = new Properties();

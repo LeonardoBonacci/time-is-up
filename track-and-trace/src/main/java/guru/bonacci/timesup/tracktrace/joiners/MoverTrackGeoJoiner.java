@@ -12,9 +12,10 @@ import guru.bonacci.timesup.tracktrace.model.Track;
 public class MoverTrackGeoJoiner implements ValueJoiner<Mover, Track, Trace> {
 
 	public Trace apply(Mover mover, Track trackGeo) {
+		final var togoKms = SloppyMath.haversinMeters(mover.lat, mover.lon, trackGeo.unmovedLat, trackGeo.unmovedLon) / 1000;
 		return Trace.builder()
 				.moverId(trackGeo.moverId)
-				.moverGeohash(geoHashLength(mover.lat, mover.lon, trackGeo.unmovedLat, trackGeo.unmovedLon))
+				.moverGeohash(geoHashLength(mover.lat, mover.lon, togoKms))
 				.moverLat(mover.lat)
 				.moverLon(mover.lon)
 				.trackingNumber(trackGeo.trackingNumber)
@@ -22,13 +23,12 @@ public class MoverTrackGeoJoiner implements ValueJoiner<Mover, Track, Trace> {
 				.unmovedGeohash(trackGeo.unmovedGeohash)
 				.unmovedLat(trackGeo.unmovedLat)
 				.unmovedLon(trackGeo.unmovedLon)
+				.togoKms(togoKms)
 				.build();
 	}
 	
-    private String geoHashLength(double moverLat, double moverLon, double unmovedLat, double unmovedLon) {
-		double distanceInKilometers = SloppyMath.haversinMeters(moverLat, moverLon, unmovedLat, unmovedLon) / 1000;
-
-		int geohashLength = 4; // > 100 km
+    private String geoHashLength(double moverLat, double moverLon, double distanceInKilometers) {
+		int geohashLength = 4; // >= 100 km
     	if (distanceInKilometers < 1.0) {
     		geohashLength = 8;
     	} else if (distanceInKilometers < 10.0) {
@@ -39,7 +39,7 @@ public class MoverTrackGeoJoiner implements ValueJoiner<Mover, Track, Trace> {
     		geohashLength = 5;
     	}	
 
-    	return GeoHash.encodeHash(unmovedLat, unmovedLon, geohashLength);
+		return GeoHash.encodeHash(moverLat, moverLon, geohashLength);
     }
 
 }

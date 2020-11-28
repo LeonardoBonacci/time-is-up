@@ -23,10 +23,10 @@ public class UnmovedGenerator {
 	static final String STORE_NO = "NaturallyOrganic";
 
 	Map<String, Unmoved> stores = ImmutableMap.<String, Unmoved> builder()
-	    		.put(STORE_T7, new Unmoved(STORE_T7, -36.731882, 74.707943))
-	    		.put(STORE_WH, new Unmoved(STORE_WH, -36.729784, 74.704225))
-	    		.put(STORE_WS, new Unmoved(STORE_WS, -36.730803, 74.706022))
-	    		.put(STORE_NO, new Unmoved(STORE_NO, -36.730223, 74.710662))
+	    		.put(STORE_T7, new Unmoved(STORE_T7, -36.731882, 124.707943))
+	    		.put(STORE_WH, new Unmoved(STORE_WH, -36.729784, 134.704225))
+	    		.put(STORE_WS, new Unmoved(STORE_WS, -36.730803, 144.706022))
+	    		.put(STORE_NO, new Unmoved(STORE_NO, -36.730223, 154.710662))
 		      .build();
 
 

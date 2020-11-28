@@ -45,6 +45,9 @@ public class TraceFilterTopology {
             (traceId, trace) -> trace.trackingNumber,
             (trace, track) -> trace
         )
+        .mapValues(
+    		(v) -> v
+        )
         .peek(
     		(k,v) -> log.info("Outgoing... {}:{}", k, v)
         )

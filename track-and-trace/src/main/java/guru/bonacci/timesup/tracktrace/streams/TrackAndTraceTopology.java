@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
-public class TrackToTraceTopology {
+public class TrackAndTraceTopology {
 
     static final String TRACK_TOPIC = "track";
     static final String MOVER_TOPIC = "mover";
@@ -39,6 +39,9 @@ public class TrackToTraceTopology {
             TRACK_TOPIC,
             Consumed.with(Serdes.String(), new JsonbSerde<>(Track.class))
         )
+	    .filterNot( // filter out tombstone messages
+    		(k,v) -> v == null
+		)
         .selectKey(
     		(k,v) -> v.moverId, Named.as("track-geo-by-moverid")
 		)
@@ -56,7 +59,7 @@ public class TrackToTraceTopology {
         )
         .join(                                                        
     		trackStream,
-    		new MoverTrackGeoJoiner(),
+    		new MoverTrackGeoJoiner(), // determines moverGeohash
             JoinWindows.of(Duration.ofDays(1)).after(Duration.ZERO), // tracked for 1 day only
             StreamJoined.with(Serdes.String(), new JsonbSerde<>(Mover.class), new JsonbSerde<>(Track.class)) 
         )

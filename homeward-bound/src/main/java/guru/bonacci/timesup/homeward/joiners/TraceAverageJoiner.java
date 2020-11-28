@@ -13,6 +13,7 @@ public class TraceAverageJoiner implements ValueJoiner<Trace, Long, Homeward> {
 				.unmovedId(trace.unmovedId)
 				.trackingNumber(trace.trackingNumber)
 				.togoMs(average != null ? average : -1)
+				.togoKms(trace.togoKms)
 				.build();
 	}
 }

@@ -19,4 +19,5 @@ public class Homeward {
 	@JsonbProperty("unmoved_id") public String unmovedId;
 	@JsonbProperty("tracking_number") public String trackingNumber;
 	@JsonbProperty("togo_ms") public long togoMs;
+	@JsonbProperty("togo_kms") public double togoKms;
 }
