@@ -11,7 +11,6 @@ import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.state.Stores;
 import org.apache.kafka.streams.state.WindowBytesStoreSupplier;
@@ -24,7 +23,6 @@ import io.quarkus.kafka.client.serialization.JsonbSerde;
 public class HomeTopology {
 
 	static final String HOME_STORE = "home-store";
-    
 	static final String HOMEWARD_TOPIC = "homeward";
 
     
@@ -58,9 +56,7 @@ public class HomeTopology {
             (unmovedId, homeward, aggr) -> aggr.updateFrom(homeward),
             Materialized.<String, Aggregation> as(storeSupplier)
                     .withKeySerde(Serdes.String())
-                    .withValueSerde(new JsonbSerde<>(Aggregation.class)))
-        .toStream()
-    	.print(Printed.toSysOut());
+                    .withValueSerde(new JsonbSerde<>(Aggregation.class)));
         
         return builder.build();
     }

@@ -26,8 +26,8 @@ public class HomeResource {
 	@Inject InteractiveQueries interactiveQueries;
 
 
-	@GET //http --follow localhost:30003/home/data/Warehouse
-	@Path("/data/{unmovedId}")
+	@GET //http --follow localhost:30004/home/Warehouse
+	@Path("/{unmovedId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response traces(@PathParam("unmovedId") String unmovedId) {
 		var result = interactiveQueries.getData(unmovedId);

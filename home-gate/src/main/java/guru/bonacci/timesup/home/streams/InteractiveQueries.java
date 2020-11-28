@@ -55,6 +55,9 @@ public class InteractiveQueries {
                 Serdes.String().serializer()
         );
 
+        log.info("active host {}", metadata.getActiveHost().host());
+        log.info("host {}", host);
+
         if (metadata == null || metadata == KeyQueryMetadata.NOT_AVAILABLE) {
             log.warn("Found no metadata for key {}", unmovedId);
             return HomewardDataResult.notFound();
