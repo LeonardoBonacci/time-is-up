@@ -56,7 +56,7 @@ kubectl apply -f k8s/tile38.yaml
 kubectl apply -f k8s/kafka-connect/tile-sink-connector.yaml
 
 kubectl port-forward tile38 9851 #bash not installed on the pod :(
-SETHOOK arrivals kafka://my-cluster-kafka-bootstrap:9092/arrival-raw NEARBY trace FENCE ROAM unmoved * 100
+SETHOOK arrivals kafka://my-cluster-kafka-bootstrap:9092/arrival-raw NEARBY trace FENCE ROAM unmoved * 50
 
 kubectl exec -i my-cluster-kafka-0 -c kafka -- \
     bin/kafka-configs.sh --alter \

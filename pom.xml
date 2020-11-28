@@ -25,7 +25,6 @@
 
 	<modules>
 		<module>arrival-cooker</module>
-		<module>cleanser</module>
 		<module>data-generator</module>
 		<module>home-gate</module>
 		<module>homeward-bound</module>
@@ -33,6 +32,7 @@
 		<module>react-home-gate</module>
 		<module>react-mover-gate</module>
 		<module>react-track-gate</module>
+		<module>react-track-purger</module>
 		<module>react-unmoved-gate</module>
 		<module>trace-filter</module>
 		<module>track-and-trace</module>

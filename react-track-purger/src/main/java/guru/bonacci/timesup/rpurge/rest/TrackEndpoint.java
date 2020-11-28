@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.cleanse.rest;
+package guru.bonacci.timesup.rpurge.rest;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
