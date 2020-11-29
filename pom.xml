@@ -24,7 +24,7 @@
 	</properties>
 
 	<modules>
-		<module>arrival-cooker</module>
+		<module>arrival-judge</module>
 		<module>data-generator</module>
 		<module>home-gate</module>
 		<module>homeward-bound</module>
@@ -34,7 +34,6 @@
 		<module>react-track-gate</module>
 		<module>react-track-purger</module>
 		<module>react-unmoved-gate</module>
-		<module>trace-filter</module>
 		<module>track-and-trace</module>
 	</modules>
 

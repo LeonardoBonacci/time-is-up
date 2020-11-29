@@ -22,7 +22,6 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StoreQueryParameters;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
@@ -44,7 +43,6 @@ public class TrackResource {
 	
 	@Inject KafkaStreams streams;
 	ReadOnlyKeyValueStore<String, Unmoved> unmovedStore;
-    @ConfigProperty(name = "geohash.length", defaultValue = "8") Integer geoHashLength;
 
     
 	@PostConstruct
@@ -67,7 +65,7 @@ public class TrackResource {
 		}
 			
 		if (unmoved != null) {
-			var trackGeo = track.enrich(unmoved, geoHashLength);
+			var trackGeo = track.enrich(unmoved);
 			emitter.send(KafkaRecord.of(trackGeo.trackingNumber, trackGeo));
 			var resp = new TrackResponse(track.trackingNumber, track.unmovedLat, track.unmovedLon);
 			log.info("response {}", resp);

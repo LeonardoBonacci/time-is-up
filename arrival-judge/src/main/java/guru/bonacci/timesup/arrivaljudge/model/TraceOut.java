@@ -1,4 +1,4 @@
-package guru.bonacci.timesup.pickup.model;
+package guru.bonacci.timesup.arrivaljudge.model;
 
 import javax.json.bind.annotation.JsonbProperty;
 
@@ -13,7 +13,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @RegisterForReflection 
-public class Trace {
+public class TraceOut {
 
 	@JsonbProperty("mover_id") public String moverId;
 	@JsonbProperty("mover_geohash") public String moverGeohash;
@@ -24,6 +24,6 @@ public class Trace {
 	@JsonbProperty("unmoved_geohash") public String unmovedGeohash;
 	@JsonbProperty("unmoved_lat") public double unmovedLat;
 	@JsonbProperty("unmoved_lon") public double unmovedLon;
-	// ignoring togo_kms
-	// ignoring arrival_radius_meters
+	@JsonbProperty("togo_kms") public double togoKms;
+	@JsonbProperty("arrival_radius_meters") public int arrivalRadiusMeters;
 }

@@ -25,10 +25,5 @@
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-hibernate-validator</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.github.davidmoten</groupId>
-			<artifactId>geo</artifactId>
-			<version>0.7.7</version>
-		</dependency>
 	</dependencies>
 </project>

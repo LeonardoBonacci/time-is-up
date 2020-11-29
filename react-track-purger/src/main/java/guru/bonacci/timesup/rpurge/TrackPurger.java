@@ -33,10 +33,10 @@ public class TrackPurger {
 		cache = CacheBuilder.newBuilder().maximumSize(1000).build(loader);
 	}	
 
-	@Incoming("pickup-stream")
-	public void stream(JsonNode pickup) { 
-		final var trackingNumber = pickup.get("tracking_number").textValue();
-		log.debug("pickup '{}'", pickup);
+	@Incoming("arrival-stream")
+	public void stream(JsonNode arrival) { 
+		final var trackingNumber = arrival.get("tracking_number").textValue();
+		log.debug("pickup '{}'", arrival);
 
 		if (cache.getIfPresent(trackingNumber) == null) {
 			log.info("gotcha - track '{}'", trackingNumber);

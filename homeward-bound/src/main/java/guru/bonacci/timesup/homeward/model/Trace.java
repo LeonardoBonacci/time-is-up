@@ -25,4 +25,5 @@ public class Trace {
 	@JsonbProperty("unmoved_lat") public double unmovedLat;
 	@JsonbProperty("unmoved_lon") public double unmovedLon;
 	@JsonbProperty("togo_kms") public double togoKms;
+	// ignoring arrival_radius_meters
 }

@@ -1,5 +1,7 @@
 package guru.bonacci.timesup.runmoved.model;
 
+import javax.json.bind.annotation.JsonbProperty;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 import org.hibernate.validator.constraints.Range;
@@ -25,4 +27,8 @@ public class Unmoved {
 
 	@Range(min = -180, max = 80, message = "Where on earth is your lon?")
 	public double lon;
+	
+	@Min(value = 20)
+	@JsonbProperty("arrival_radius_meters") 
+	public int arrivalRadiusMeters;
 }

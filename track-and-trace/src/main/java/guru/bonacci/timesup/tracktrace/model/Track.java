@@ -18,7 +18,6 @@ public class Track {
 	@JsonbProperty("mover_id") public String moverId;
 	@JsonbProperty("tracking_number") public String trackingNumber;
 	@JsonbProperty("unmoved_id") public String unmovedId;
-	@JsonbProperty("unmoved_geohash") public String unmovedGeohash;
 	@JsonbProperty("unmoved_lat") public double unmovedLat;
 	@JsonbProperty("unmoved_lon") public double unmovedLon;
 }

@@ -10,12 +10,22 @@
 	    <version>1.0-SNAPSHOT</version>
 	    <relativePath>../</relativePath>
 	</parent>
-	<artifactId>track-and-trace</artifactId>
+	<artifactId>arrival-judge</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-kafka-streams</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-spatial</artifactId>
+			<version>8.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.davidmoten</groupId>
+			<artifactId>geo</artifactId>
+			<version>0.7.7</version>
 		</dependency>
 	</dependencies>
 </project>

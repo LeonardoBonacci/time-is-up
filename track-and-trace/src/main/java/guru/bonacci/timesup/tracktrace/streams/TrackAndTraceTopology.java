@@ -15,7 +15,7 @@ import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.StreamJoined;
 
-import guru.bonacci.timesup.tracktrace.joiners.MoverTrackGeoJoiner;
+import guru.bonacci.timesup.tracktrace.joiners.MoverTrackJoiner;
 import guru.bonacci.timesup.tracktrace.model.Mover;
 import guru.bonacci.timesup.tracktrace.model.Trace;
 import guru.bonacci.timesup.tracktrace.model.Track;
@@ -59,7 +59,7 @@ public class TrackAndTraceTopology {
         )
         .join(                                                        
     		trackStream,
-    		new MoverTrackGeoJoiner(), // determines moverGeohash
+    		new MoverTrackJoiner(),
             JoinWindows.of(Duration.ofDays(1)).after(Duration.ZERO), // tracked for 1 day only
             StreamJoined.with(Serdes.String(), new JsonbSerde<>(Mover.class), new JsonbSerde<>(Track.class)) 
         )

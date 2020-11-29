@@ -13,6 +13,7 @@ public class TimedArrival extends Arrival {
 
 	public TimedArrival(Arrival arrival, long rowtime) {
 		this.moverId = arrival.moverId;
+		this.trackingNumber = arrival.trackingNumber;
 		this.unmovedId = arrival.unmovedId;
         this.rowtime = rowtime;
 	}

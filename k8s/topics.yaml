@@ -48,16 +48,6 @@ spec:
   replicas: 1
   partitions: 12
 ---
-apiVersion: kafka.strimzi.io/v1beta1
-kind: KafkaTopic
-metadata:
-  name: arrival-raw
-  labels:
-      strimzi.io/cluster: my-cluster
-spec:
-  replicas: 1
-  partitions: 4
----
   apiVersion: kafka.strimzi.io/v1beta1
   kind: KafkaTopic
   metadata:
@@ -67,16 +57,6 @@ spec:
   spec:
     replicas: 1
     partitions: 12
----
-  apiVersion: kafka.strimzi.io/v1beta1
-  kind: KafkaTopic
-  metadata:
-    name: pickup
-    labels:
-        strimzi.io/cluster: my-cluster
-  spec:
-    replicas: 1
-    partitions: 4
 ---
   apiVersion: kafka.strimzi.io/v1beta1
   kind: KafkaTopic

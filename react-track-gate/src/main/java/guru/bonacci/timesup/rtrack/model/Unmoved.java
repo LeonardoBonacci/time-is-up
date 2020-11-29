@@ -1,5 +1,7 @@
 package guru.bonacci.timesup.rtrack.model;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,4 +18,6 @@ public class Unmoved {
 	public String id;
 	public double lat;
 	public double lon;
+	@JsonbProperty("arrival_radius_meters") 
+	public int arrivalRadiusMeters;
 }

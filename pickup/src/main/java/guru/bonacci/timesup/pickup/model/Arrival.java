@@ -16,5 +16,6 @@ import lombok.ToString;
 public class Arrival {
 
 	@JsonbProperty("mover_id") public String moverId;
+	@JsonbProperty("tracking_number") public String trackingNumber;
 	@JsonbProperty("unmoved_id") public String unmovedId;
 }

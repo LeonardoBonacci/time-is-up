@@ -32,7 +32,6 @@ public class PickupTopology {
 
     static final String ARRIVAL_TOPIC = "arrival";
     static final String TRACE_TOPIC = "trace";
-    static final String PICKUP_TOPIC = "pickup";
     static final String AVERAGER_TOPIC = "geohash-averager";
 
     
@@ -75,10 +74,6 @@ public class PickupTopology {
         .peek(
     		(k,v) -> log.info("Outgoing... {}:{}", k, v)
         )
-        .through(
-        	PICKUP_TOPIC,
-        	Produced.with(Serdes.String(), traceArrivalSerde)
-    	)
         .groupBy(
     		(k,v) -> v.moverGeohash + '/' + v.unmovedGeohash,
     		Grouped.with(Serdes.String(), traceArrivalSerde)
