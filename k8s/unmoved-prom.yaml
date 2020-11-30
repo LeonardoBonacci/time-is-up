@@ -1,0 +1,20 @@
+# kubectl get -n monitoring prometheus -o yaml
+#  serviceMonitorSelector:
+#      matchLabels:
+#        release: prometheus-operator-1606699291
+
+#targetPort of monitored services must be named 'my-http'
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: timesup-sm
+  labels:
+    release: prometheus-operator-1606699291
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: timesup-react-unmoved-gate
+  endpoints:
+  - port: http
+    interval: 5s

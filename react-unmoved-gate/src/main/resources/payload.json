@@ -1,5 +1,6 @@
 {
 	"id": "nowhere",
 	"lat": 1.0,
-	"lon": 1.0
+	"lon": 1.0,
+	"arrival_radius_meters": 100
 }
